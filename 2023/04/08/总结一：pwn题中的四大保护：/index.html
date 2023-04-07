@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>总结一：pwn题中的四大保护： | SOME PEDLARY OF MAHO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="NX防护：![[Pasted image 20221023181159.png]]
+
+意义：No-eXecute（不可执行）
+基本原理：是将数据所在内存页标识为不可执行，当程序溢出成功转入Shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。（got E">
+  
+  
+  
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+  
+  <link rel="stylesheet" href="../../../../css/style.css">
+  
+    <link rel="stylesheet" href="../../../../fancybox/jquery.fancybox-1.3.4.css">
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div id="nav-outer">
+  <nav id="main-nav" class="outer">
+    <a id="main-nav-toggle" class="nav-icon"></a>
+    
+      <a class="main-nav-link" href="../../../../index.html">Home</a>
+    
+      <a class="main-nav-link" href="../../../../archives">Archives</a>
+    
+    <div class="main-nav-space-between"></div>
+    
+  </nav>
+</div>
+<div id="header-title">
+  <h1 id="logo-wrap">
+    <a href="../../../../index.html" id="logo">SOME PEDLARY OF MAHO</a>
+  </h1>
+  
+</div>
+
+      <div id="content" class="outer">
+        <section id="main"><article id="post-总结一：pwn题中的四大保护：" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="" class="article-date">
+  <time class="dt-published" datetime="2023-04-07T22:18:50.000Z" itemprop="datePublished">2023-04-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="../../../../categories/CG/">CG</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      总结一：pwn题中的四大保护：
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="NX防护："><a href="#NX防护：" class="headerlink" title="NX防护："></a>NX防护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><p>![[Pasted image 20221023181159.png]]</p>
+<ul>
+<li>意义<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>No-eXecute<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>不可执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></li>
+<li>基本原理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>是将数据所在内存页标识为不可执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>当程序溢出成功转入Shellcode时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>程序会尝试在数据页面上执行指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>此时CPU就会抛出异常<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而不是去执行恶意指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>got ELF while …….<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>{思考如果存在mprotect可以进行NX防护的绕过}</li>
+<li>用来防护的攻击手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>栈溢出 + 跳到栈上执行shellcode</li>
+<li>添加编译选项-z execstack 会关闭NX保护</li>
+<li>绕过方式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>ROP<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>在代码段中寻在合适gadget<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>构造gadget链<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>最终实现获取shell</li>
+</ul>
+<h2 id="CANARY保护："><a href="#CANARY保护：" class="headerlink" title="CANARY保护："></a>CANARY保护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><p>![[Pasted image 20221023181117.png]]</p>
+<ul>
+<li>栈溢出保护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>阻止所有单纯的栈溢出<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></li>
+<li>基本原理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>是一种针对缓冲区溢出攻击的缓解手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>当函数存在缓冲区溢出攻击漏洞时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>攻击者可以覆盖栈上的返回地址来让Shellcode能够得到执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>当启用栈保护后<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>函数开始执行的时候<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>会先往栈里插入Cookie信息<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>当函数真正返回的时候会验证Cookie信息是否合法<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>如果不合法就停止程序运行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>攻击者在覆盖返回地址的是否往往也会将Cookie信息给覆盖掉<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>导致栈保护检查失败而阻止Shellcode的执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>在Linux中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将Cookie信息称为Canary  </li>
+<li>通俗解释<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>在栈中紧挨ebp的上一个位置存放一个随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span>当发生栈溢出时程序检查CANARY这个值和之前的是否一致<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>如果不一致<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则  不会往下运行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而避免了缓冲区溢出攻击<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li><ul>
+<li>添加编译选项 -fno-stack-protector 会关闭程序的stack canary栈保护</li>
+</ul>
+</li>
+<li>绕过方式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span> 获取填充的随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>通过爆破<span class="bd-box"><h-char class="bd bd-beg"><h-inner>、</h-inner></h-char></span>泄露等方法获取随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>制造栈溢出的时候在原有位置写入随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而实现Canary的绕过<br>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>劫持<code>sym.imp.__stack_chk_fail</code>函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>若果可以劫持<code>sym.imp.__stack_chk_fail</code>函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>使得程序调用它时调用别的函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>就可以随意覆写Canary的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而不会触发错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>实现Canary的绕过<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br> 具体绕过及例题演示参考 <a target="_blank" rel="noopener" href="https://blog.csdn.net/Morphy_Amo/article/details/122120696">Canary原理及绕过</a></li>
+</ul>
+<h2 id="PIE-x2F-ALSR保护："><a href="#PIE-x2F-ALSR保护：" class="headerlink" title="PIE&#x2F;ALSR保护："></a>PIE&#x2F;ALSR保护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><ul>
+<li>Position-Independent Executable</li>
+<li>基本原理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span> 应用了PIE的程序在每次加载时都会变换加载基址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而使位于程序本身的gadget也失效</li>
+<li>通俗解释<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>PIE enabled如果程序开启这个地址随机化选项就意味着程序每次运行的时候地址都会变化<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>而如果没有开PIE的话那么No PIE(0x400000)<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>括号内的数据就是程序的基地址.</li>
+<li>防止攻击手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>构造ROP链攻击如<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>ret2libc</li>
+<li>添加编译选项 -no-pie 会关闭程序的PIE保护</li>
+<li>绕过方式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>通过泄露libc基址的方法获取libc版本加便宜量来获取基地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ul>
+<h2 id="RELRO保护："><a href="#RELRO保护：" class="headerlink" title="RELRO保护："></a>RELRO保护<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><ul>
+<li><p>基本原理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span> 重定位<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>设置符号重定向表格为只读或在程序启动时就解析并绑定所有动态符号<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而减少对GOT<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>Global Offset Table<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>攻击</p>
+</li>
+<li><p>防止攻击者的攻击手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>系统调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>防止got表的调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+</li>
+<li><p>三种保护模式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>  1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>No RELRO<br>  2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>Partial RELRO<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>两者区别在于got.plt位于那一段是可读可写的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></p>
+<p>  3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>Full RELRO<br>  .got 与.got.plt都只读不写<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>对got表的一种防护手段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></p>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="../%E7%AE%80%E8%AE%B0%E5%BD%95%E6%A0%88%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E9%80%94%E4%B8%AD%E5%A4%8D%E4%B9%A0%E6%B1%87%E7%BC%96%E7%9A%84%E6%B5%81%E7%A8%8B/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          简记录栈迁移学习途中复习汇编的流程
+        
+      </div>
+    </a>
+  
+  
+    <a href="../mprotect%EF%BC%88%EF%BC%89%E5%87%BD%E6%95%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">
+        
+          mprotect（）函数
+        
+      </div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 cy<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a><br>
+      
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="../../../../index.html" class="mobile-nav-link">Home</a>
+  
+    <a href="../../../../archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="../../../../js/clipboard.min.js"></script>
+<script src="../../../../js/jquery-1.4.3.min.js"></script>
+
+<script src="../../../../fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+
+
+<script src="../../../../js/script.js"></script>
+
+
+
+
+
+
+<script>
+  MathJax = {
+    options: {
+      enableMenu: false
+    },
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    }
+  };
+</script>
+<!-- <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+    CommonHTML: {
+      linebreaks: false
+    }
+  });
+  </script> -->
+<script type="text/javascript" id="MathJax-script" async
+  src="../../../../mathjax/tex-chtml.js">
+</script>
+<!-- <script type="text/javascript"
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML">
+</script> -->
+
+
+
+  </div>
+</body>
+</html>
