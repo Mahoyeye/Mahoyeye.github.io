@@ -60,7 +60,7 @@
         
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="2023/04/08/pwnable_orw%EF%BC%88%E9%87%8D%E7%82%B9%E4%B8%BA%E6%89%8B%E5%86%99shellcode%E4%B8%8E%E6%B2%99%E7%9B%92orw%E6%9C%BA%E5%88%B6%EF%BC%89/">PWN-MaHo</a>
+      <a class="p-name article-title" href="2023/04/08/pwnable_orw%EF%BC%88%E9%87%8D%E7%82%B9%E4%B8%BA%E6%89%8B%E5%86%99shellcode%E4%B8%8E%E6%B2%99%E7%9B%92orw%E6%9C%BA%E5%88%B6%EF%BC%89/">pwnable_orw（重点为手写shellcode与沙盒orw机制）</a>
     </h1>
   
 
@@ -69,7 +69,7 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="pwnable-orw（重点为手写shellcode与沙盒orw机制）"><a href="#pwnable-orw（重点为手写shellcode与沙盒orw机制）" class="headerlink" title="pwnable_orw（重点为手写shellcode与沙盒orw机制）"></a>pwnable_orw<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>重点为手写shellcode与沙盒orw机制<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></h1><h2 id="1-安全检测："><a href="#1-安全检测：" class="headerlink" title="1.安全检测："></a>1.安全检测<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><p><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680616534477-d06bae33-4c05-46f5-9684-550f85e669a9.png#averageHue=%23494444&clientId=u99c38dd8-9f5b-4&from=drop&height=177&id=u47d6c387&name=1979919-20201015133023640-1470491081.png&originHeight=153&originWidth=403&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=15322&status=done&style=none&taskId=u4f22b48b-418b-452b-916b-faaf34c910b&title=&width=465" alt="1979919-20201015133023640-1470491081.png"></p>
+        <h1 id="pwnable-orw（重点为手写shellcode与沙盒orw机制）"><a href="#pwnable-orw（重点为手写shellcode与沙盒orw机制）" class="headerlink" title="pwnable_orw（重点为手写shellcode与沙盒orw机制）"></a>pwnable_orw<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>重点为手写shellcode与沙盒orw机制<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></h1><h2 id="1-安全检测："><a href="#1-安全检测：" class="headerlink" title="1.安全检测："></a>1.安全检测<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><p><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680616534477-d06bae33-4c05-46f5-9684-550f85e669a9.png" alt="1979919-20201015133023640-1470491081.png"></p>
 <ol>
 <li>32位操作系统</li>
 <li>Partial RELRO:got.plt可读可写</li>
