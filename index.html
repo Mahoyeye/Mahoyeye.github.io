@@ -44,6 +44,49 @@
       <div id="content" class="outer">
         <section id="main">
   
+    <article id="post-CANARY爆破" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="2023/04/21/CANARY%E7%88%86%E7%A0%B4/" class="article-date">
+  <time class="dt-published" datetime="2023-04-21T10:08:23.000Z" itemprop="datePublished">2023-04-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="categories/CTF-PWN/">CTF-PWN</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="2023/04/21/CANARY%E7%88%86%E7%A0%B4/">CANARY爆破</a>
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><img src="https://github.com/Mahoyeye/blogImage/blob/main/canary%E7%88%86%E7%A0%B4.png?raw=true" alt="canary爆破.png"><br>注意这里是逐字节爆破<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>fork函数为一个特殊函数两个返回三种状态<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&gt;0返回父函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&#x3D;&#x3D; 0继续子进程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&lt;0发生错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br><em>注意注意</em><span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这里的canary已经存在<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>所以内部循环流程为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>逐字节进行循环<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>若和已有canary不同<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>开启一个新的子进程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>若符合<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则读取已有之后的canary<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>脚本进行接收符合条件<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>并进行下一字节循环的爆破<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>直到探明为止<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-bss" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="2023/04/15/bss/" class="article-date">
@@ -800,6 +843,10 @@ r.interactive()q
       <ul>
         
           <li>
+            <a href="2023/04/21/CANARY%E7%88%86%E7%A0%B4/">CANARY爆破</a>
+          </li>
+        
+          <li>
             <a href="2023/04/15/bss/">bss段上的格式化字符串处理</a>
           </li>
         
@@ -813,10 +860,6 @@ r.interactive()q
         
           <li>
             <a href="2023/04/08/%E6%80%BB%E7%BB%93%E4%B8%80%EF%BC%9Apwn%E9%A2%98%E4%B8%AD%E7%9A%84%E5%9B%9B%E5%A4%A7%E4%BF%9D%E6%8A%A4%EF%BC%9A/">总结一：pwn题中的四大保护：</a>
-          </li>
-        
-          <li>
-            <a href="2023/04/08/mprotect%EF%BC%88%EF%BC%89%E5%87%BD%E6%95%B0/">mprotect（）函数</a>
           </li>
         
       </ul>
