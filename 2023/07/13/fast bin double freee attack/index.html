@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   
   
-  <title>CANARY爆破 | SOME PEDLARY OF MAHO(please be brave and keep running)</title>
+  <title>fast bin double freee attack | SOME PEDLARY OF MAHO(please be brave and keep running)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
-  <meta name="description" content="注意这里是逐字节爆破，fork函数为一个特殊函数两个返回三种状态，&amp;gt;0返回父函数，&amp;#x3D;&amp;#x3D; 0继续子进程，&amp;lt;0发生错误，注意注意，这里的canary已经存在，所以内部循环流程为：逐字节进行循环，若和已有canary不同，则错误，开启一个新的子进程，若符合，则读取已有之后的">
+  <meta name="description" content="核心：double free 写fake chunk的fd使malloc函数将栈上地址作为fast bin的堆快进行利用。
+">
   
   
   
@@ -44,14 +45,14 @@
 </div>
 
       <div id="content" class="outer">
-        <section id="main"><article id="post-CANARY爆破" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-fast bin double freee attack" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="" class="article-date">
-  <time class="dt-published" datetime="2023-04-21T10:08:23.000Z" itemprop="datePublished">2023-04-21</time>
+  <time class="dt-published" datetime="2023-07-13T07:02:24.000Z" itemprop="datePublished">2023-07-13</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="../../../../categories/CTF-PWN/">CTF-PWN</a>►<a class="article-category-link" href="../../../../categories/CTF-PWN/learing-summary/">learing summary</a>
+    <a class="article-category-link" href="../../../../categories/CTF-PWN/">CTF-PWN</a>►<a class="article-category-link" href="../../../../categories/CTF-PWN/HEAP/">HEAP</a>
   </div>
 
   </div>
@@ -62,7 +63,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      CANARY爆破
+      fast bin double freee attack
     </h1>
   
 
@@ -71,7 +72,7 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p><img src="https://github.com/Mahoyeye/blogImage/blob/main/canary%E7%88%86%E7%A0%B4.png?raw=true" alt="canary爆破.png"><br>注意这里是逐字节爆破<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>fork函数为一个特殊函数两个返回三种状态<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&gt;0返回父函数<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&#x3D;&#x3D; 0继续子进程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>&lt;0发生错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br><em>注意注意</em><span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>这里的canary已经存在<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>所以内部循环流程为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>逐字节进行循环<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>若和已有canary不同<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则错误<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>开启一个新的子进程<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>若符合<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>则读取已有之后的canary<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>脚本进行接收符合条件<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>并进行下一字节循环的爆破<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>直到探明为止<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+        <p>核心<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>double free 写fake chunk的fd使malloc函数将栈上地址作为fast bin的堆快进行利用<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
 
       
     </div>
@@ -85,21 +86,12 @@
     
 <nav id="article-nav">
   
-    <a href="../../26/DASCTF%20APR/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          DASCTF APR
-        
-      </div>
-    </a>
   
-  
-    <a href="../../15/bss/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="../../../04/26/DASCTF%20APR/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">
         
-          bss段上的格式化字符串处理
+          DASCTF APR
         
       </div>
     </a>
@@ -124,23 +116,23 @@
       <ul>
         
           <li>
-            <a href="../../../07/13/fast%20bin%20double%20freee%20attack/">fast bin double freee attack</a>
+            <a href="">fast bin double freee attack</a>
           </li>
         
           <li>
-            <a href="../../26/DASCTF%20APR/">DASCTF APR</a>
+            <a href="../../../04/26/DASCTF%20APR/">DASCTF APR</a>
           </li>
         
           <li>
-            <a href="">CANARY爆破</a>
+            <a href="../../../04/21/CANARY%E7%88%86%E7%A0%B4/">CANARY爆破</a>
           </li>
         
           <li>
-            <a href="../../15/bss/">bss段上的格式化字符串处理</a>
+            <a href="../../../04/15/bss/">bss段上的格式化字符串处理</a>
           </li>
         
           <li>
-            <a href="../../08/pwnable_orw%EF%BC%88%E9%87%8D%E7%82%B9%E4%B8%BA%E6%89%8B%E5%86%99shellcode%E4%B8%8E%E6%B2%99%E7%9B%92orw%E6%9C%BA%E5%88%B6%EF%BC%89/">pwnable_orw（重点为手写shellcode与沙盒orw机制）</a>
+            <a href="../../../04/08/pwnable_orw%EF%BC%88%E9%87%8D%E7%82%B9%E4%B8%BA%E6%89%8B%E5%86%99shellcode%E4%B8%8E%E6%B2%99%E7%9B%92orw%E6%9C%BA%E5%88%B6%EF%BC%89/">pwnable_orw（重点为手写shellcode与沙盒orw机制）</a>
           </li>
         
       </ul>
