@@ -73,14 +73,13 @@
       
         <h2 id="bss段上的格式化字符串处理–SWPUCTF-2019-login"><a href="#bss段上的格式化字符串处理–SWPUCTF-2019-login" class="headerlink" title="bss段上的格式化字符串处理–SWPUCTF_2019_login"></a>bss段上的格式化字符串处理–SWPUCTF_2019_login</h2><h3 id="1，区别："><a href="#1，区别：" class="headerlink" title="1，区别："></a>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>区别<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><p>bss段上的格式化字符串和栈上的格式化字符串最大的区别在于<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br><strong>输入的格式化字符串被放在<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>.bss段<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>上<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>导致无法直接利用格式化字符串写在栈上的数据进行任意地址写<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></strong><br>采取的攻击措施是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br><strong><em>利用ebp寄存器的地址映射<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>将ebp映射的—-&gt;一个栈中地址A的指针指向—-&gt;和got表相似的地址B<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而完成先将B地址修改为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>got表的地址—&gt;借助两次格式化字符串修改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>got表的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而将<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>的got表的值修改为<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>system<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>的got表的值<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>getshell<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>+v+ yes<span class="bd-box"><h-char class="bd bd-beg"><h-inner>！</h-inner></h-char></span></em></strong></p>
 <p><strong>总结<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>既然写的东西都在bss段中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>那么利用ebp的地址映射把与目标输入的类似的栈中已有的地址先写进去<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>之后不断修改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>构造出合适的攻击链进行get shell</strong></p>
-<h3 id="2，IDA分析："><a href="#2，IDA分析：" class="headerlink" title="2，IDA分析："></a>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>IDA分析<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><p><img src="https://github.com/Mahoyeye/blogImage/blob/main/bssfmastrpic1.png?raw=true" alt="3c63bdb0a9034a90a4b37c806581af9d.png"><br>明显的格式化漏洞<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>但写在了bss段上<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></p>
-<h3 id="3，gdb调试："><a href="#3，gdb调试：" class="headerlink" title="3，gdb调试："></a>3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>gdb调试<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><p><img src="https://github.com/Mahoyeye/blogImage/blob/main/bssfmastrpic2.png?raw=true" alt="11ec9e63d94043509c6b2f05f039a4ce.png"></p>
-<ul>
+<h3 id="2，IDA分析："><a href="#2，IDA分析：" class="headerlink" title="2，IDA分析："></a>2<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>IDA分析<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><p>![[bssfmastrpic1.png]]<br>明显的格式化漏洞<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>但写在了bss段上<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span></p>
+<h3 id="3，gdb调试："><a href="#3，gdb调试：" class="headerlink" title="3，gdb调试："></a>3<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>gdb调试<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><ul>
 <li>ebp寄存器的的参数偏移是6</li>
 <li>ebp所指的映射地址为0xffc78f28<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>参数偏移是10</li>
 <li>两个以80开头<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>与got表地址相似的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>栈中的地址参数偏移分别是9<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>11</li>
 </ul>
-<p>通过修改这个ebp<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>即可以修改两个与got表相近的栈中地址为<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>的got表地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>之后只要将这两个victim_got地址分高低位分别一起修改为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>system<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>的got表地址,并输入<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>sh<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>即可get shell<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>构造结果如下<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br><img src="https://github.com/Mahoyeye/blogImage/blob/main/bssfmastrpic3.png?raw=true" alt="768f3238465e47238e0103a4ddee64df.png"></p>
+<p>通过修改这个ebp<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>即可以修改两个与got表相近的栈中地址为<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>的got表地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>之后只要将这两个victim_got地址分高低位分别一起修改为<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>system<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>的got表地址,并输入<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>sh<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>即可get shell<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>构造结果如下<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br><strong>这里的printf+2是因为这里修改的是printfgot表的前两位<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>32位操作系统4位一字节<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span>先改前两位再改后两位</strong><br>![[bssfmastrpic3 2.png]]</p>
 <h3 id="4，exp："><a href="#4，exp：" class="headerlink" title="4，exp："></a>4<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>exp<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span></h3><pre><code class="python">from LibcSearcher import *
 from pwn import *
 
@@ -151,7 +150,38 @@ io.interactive()
 <li>在做bss段中的格式化字符串题目时<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>我们改变ebp指向的地址进行的地址映射从而实现了修改栈中相似数据更替目标数据<span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>约等于<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span>向栈空间写入数据<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
 <li>做类似题目的前提是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>栈中存在可泄漏的got表地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
 <li>写入两个victim_got地址目的是通过依次修改它们高低两字节而高修稿成功率的将<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>printf<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>函数地址修改为<span class="bd-box"><h-char class="bd bd-end"><h-inner>“</h-inner></h-char></span>system<span class="bd-box"><h-char class="bd bd-beg"><h-inner>”</h-inner></h-char></span>函数地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></li>
+<li>heap addr<span class="bd-box"><h-char class="bd bd-beg"><h-inner>？</h-inner></h-char><h-char class="bd bd-beg"><h-inner>？</h-inner></h-char></span>这里的地址标注是有问题的<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>等会思考后写上去<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>op_stack_now&#x3D;target-0x28<br>stack_addr&#x3D;top_stack_now+0x2c<br>stack_addr2&#x3D;top_stack_now+0x24<br>bian1&#x3D;stack_addr&amp;0xffff<br>bian2&#x3D;elf.got[‘printf’]&amp;0xffff<br>bian3&#x3D;stack_addr2&amp;0xffff<br>system_low&#x3D;system &amp;0xffff<br>system_hign&#x3D;(system&gt;&gt;16)&amp;0xffff<br>————————————————</li>
+<li>这里bss段的第一个参数是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>![[bssfmastrpic3 2.png]]<br>第二行的ja哪里</li>
 </ol>
+<pre><code class="shell">pwndbg&gt; b printf
+pwndbg&gt; r
+pwndbg&gt; stack 30
+00:0000│ esp  0xffffcfdc —▸ 0x8048540 (do_fmt+69) ◂— add    esp, 0x10 //ret地址
+01:0004│      0xffffcfe0 —▸ 0x804a060 (buf) ◂— 0x61616161 (&#39;aaaa&#39;)  //输入的格式化字符串
+02:0008│      0xffffcfe4 —▸ 0x8048640 ◂— jno    0x80486b7 /* &#39;quit&#39; */  //偏移1
+03:000c│      0xffffcfe8 ◂— 0x4    //偏移2
+04:0010│      0xffffcfec —▸ 0x804857c (play+51) ◂— add    esp, 0x10
+05:0014│      0xffffcff0 —▸ 0x8048645 ◂— cmp    eax, 0x3d3d3d3d
+06:0018│      0xffffcff4 —▸ 0xf7fb3000 (_GLOBAL_OFFSET_TABLE_) ◂— 0x1b1db0
+07:001c│ ebp  0xffffcff8 —▸ 0xffffd008 —▸ 0xffffd018 ◂— 0x0   //偏移6&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-end&quot;&gt;&lt;h-inner&gt;【&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;ebp=0xffffcff8-&gt;旧ebp=0xffffd008&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;，&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;在MIT6.828中我们学习过&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;，&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;设置栈就是通过设置ebp=0&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;，&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;因此这个0x0是最后一个ebp&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;】&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;
+08:0020│      0xffffcffc —▸ 0x8048584 (play+59) ◂— nop      //偏移7
+09:0024│      0xffffd000 —▸ 0xf7fb3d60 (_IO_2_1_stdout_) ◂— 0xfbad2887
+0a:0028│      0xffffd004 ◂— 0x0
+0b:002c│      0xffffd008 —▸ 0xffffd018 ◂— 0x0    //偏移10&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-end&quot;&gt;&lt;h-inner&gt;【&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;旧ebp&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;】&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;
+0c:0030│      0xffffd00c —▸ 0x80485b1 (main+42) ◂— nop        //偏移11
+0d:0034│      0xffffd010 —▸ 0xf7fb33dc (__exit_funcs) —▸ 0xf7fb41e0 (initial) ◂— 0x0
+0e:0038│      0xffffd014 —▸ 0xffffd030 ◂— 0x1
+0f:003c│      0xffffd018 ◂— 0x0
+10:0040│      0xffffd01c —▸ 0xf7e19637 (__libc_start_main+247) ◂— add    esp, 0x10
+11:0044│      0xffffd020 —▸ 0xf7fb3000 (_GLOBAL_OFFSET_TABLE_) ◂— 0x1b1db0
+... ↓
+13:004c│      0xffffd028 ◂— 0x0
+14:0050│      0xffffd02c —▸ 0xf7e19637 (__libc_start_main+247) ◂— add    esp, 0x10
+15:0054│      0xffffd030 ◂— 0x1
+16:0058│      0xffffd034 —▸ 0xffffd0c4 —▸ 0xffffd290 ◂— 0x6d6f682f (&#39;/hom&#39;)
+17:005c│      0xffffd038 —▸ 0xffffd0cc —▸ 0xffffd2cb ◂— &#39;XDG_VTNR=7&#39;
+</code></pre>
+<p>这一题也可以从写入的buf段地址进行判断<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>6. <a target="_blank" rel="noopener" href="https://github.com/spidermana/spidermana.github.io/blob/27d5c5d56df3b1366526cbb05267cf4ae92b4af3/_posts/2019-04-17-hitcon_pwn_writeUp.md#lab9">spidermana.github.io&#x2F;_posts&#x2F;2019-04-17-hitcon_pwn_writeUp.md at 27d5c5d56df3b1366526cbb05267cf4ae92b4af3 · spidermana&#x2F;spidermana.github.io</a><br>不会的化可以看以上github的详细解读</p>
 
       
     </div>
@@ -204,6 +234,14 @@ io.interactive()
       <ul>
         
           <li>
+            <a href="../../../../2024/01/14/DDDD/">DDDD</a>
+          </li>
+        
+          <li>
+            <a href="../../../10/01/Pasted%20image%2020230312120910.png/">(no title)</a>
+          </li>
+        
+          <li>
             <a href="../../../07/13/fast%20bin%20double%20freee%20attack/">fast bin double freee attack</a>
           </li>
         
@@ -213,14 +251,6 @@ io.interactive()
         
           <li>
             <a href="../../21/CANARY%E7%88%86%E7%A0%B4/">CANARY爆破</a>
-          </li>
-        
-          <li>
-            <a href="">bss段上的格式化字符串处理</a>
-          </li>
-        
-          <li>
-            <a href="../../08/pwnable_orw%EF%BC%88%E9%87%8D%E7%82%B9%E4%B8%BA%E6%89%8B%E5%86%99shellcode%E4%B8%8E%E6%B2%99%E7%9B%92orw%E6%9C%BA%E5%88%B6%EF%BC%89/">pwnable_orw（重点为手写shellcode与沙盒orw机制）</a>
           </li>
         
       </ul>
@@ -245,7 +275,7 @@ io.interactive()
   <div class="outer">
     <div id="footer-info" class="inner">
       
-      &copy; 2023 cy<br>
+      &copy; 2024 cy<br>
       Powered by <a href="https://hexo.io/" target="_blank">Hexo</a><br>
       
     </div>

@@ -93,8 +93,12 @@
 低地址  
 </code></pre>
 <p>5<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈和寄存器的相互作用关系<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>弹出old ebp<code>地址</code>给ebp<code>寄存器</code>之后ebp<code>寄存器</code>在栈旁侧进行指向<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
-<p>6<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>leave为先动<em>sp寄存器指针<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>再动bp寄存器</em><span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而栈迁移的攻击核心就在于<em>利用两次的leave指令使得sp指针被篡改到目标地址</em><span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>篡改ep地址为目标地址见-4<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>———————————————————————————分割线<br>#以下为栈迁移的讲解<br><code>核心思想&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;：&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;</code>让esp跑两次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>第一次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>使<code>篡改</code>过后的old ebp地址出栈<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>进入ebp中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>第二次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>使esp跟随到篡改过后的old ebp当中开辟出一段新的栈空间<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
-<p>![[Pasted image 20230303190918.png]]<br>![[Pasted image 20230303190931.png]]<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/max1z/p/15299000.html">栈迁移原理介绍与应用 - Max1z - 博客园 (cnblogs.com)</a><br>这篇文章讲解的足够详细<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>看这篇文章就足矣<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>要点归纳<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><strong>ebp</strong> 覆盖为 HijackAddr-4的目的是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>当第二次执行完leave的pop ebp后esp回向高地址移动四个字节<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而使得esp指向 HijackAddr的地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而使得<strong>eip</strong>中成功放入目标地址完成程序流窜改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>6<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>leave为先动<em>sp寄存器指针<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>再动bp寄存器</em><span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>而栈迁移的攻击核心就在于<em>利用两次的leave指令使得sp指针被篡改到目标地址</em><span class="bd-box"><h-char class="bd bd-end"><h-inner>（</h-inner></h-char></span>篡改ep地址为目标地址见-4<span class="bd-box"><h-char class="bd bd-beg"><h-inner>）</h-inner></h-char></span><br>———————————————————————————分割线<br>#以下为栈迁移的讲解<br><code>核心思想&lt;span class=&quot;bd-box&quot;&gt;&lt;h-char class=&quot;bd bd-beg&quot;&gt;&lt;h-inner&gt;：&lt;/h-inner&gt;&lt;/h-char&gt;&lt;/span&gt;</code>让esp跑两次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><br>第一次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>使<code>篡改</code>过后的old ebp地址出栈<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>指向fake ebp<br>第二次<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>使esp跟随到fake ebp当中开辟出一段新的栈空间<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span></p>
+<p>![[Pasted image 20230303190918.png]]<br>![[Pasted image 20230303190931.png]]<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/max1z/p/15299000.html">栈迁移原理介绍与应用 - Max1z - 博客园 (cnblogs.com)</a><br>这篇文章讲解的足够详细<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>看这篇文章就足矣<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>要点归纳<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span><br>1<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span><strong>ebp</strong> 覆盖为 HijackAddr-4的目的是<span class="bd-box"><h-char class="bd bd-beg"><h-inner>：</h-inner></h-char></span>当第二次执行完leave的pop ebp后esp回向高地址移动四个字节<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而使得esp指向 HijackAddr的地址<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>从而使得<strong>eip</strong>中成功放入目标地址完成程序流窜改<span class="bd-box"><h-char class="bd bd-beg"><h-inner>。</h-inner></h-char></span><br>2. # 第二次溢出<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>rop写在s中<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>栈迁移到s<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>调用system<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>参数为自己写在栈上的&#x2F;bin&#x2F;sh<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>参数偏移计算可知</p>
+<pre><code class="python">payload=p32(elf.plt[&#39;system&#39;])+p32(elf.sym[&#39;_start&#39;])+p32(leak_ebp-offset+0xc)+b&#39;/bin/sh\x00&#39;
+payload=payload.ljust(0x28,b&#39;a&#39;)+p32(target_addr)+p32(leave_ret)
+</code></pre>
+<p>第一行为向s中写数据<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>sys plt + ret add + binsh地址 + binsh字符串<br>第二行为写入数据并对齐<span class="bd-box"><h-char class="bd bd-beg"><h-inner>，</h-inner></h-char></span>数据 + target ebp + leave ret  </p>
 
       
     </div>
@@ -147,6 +151,14 @@
       <ul>
         
           <li>
+            <a href="../../../../2024/01/14/DDDD/">DDDD</a>
+          </li>
+        
+          <li>
+            <a href="../../../10/01/Pasted%20image%2020230312120910.png/">(no title)</a>
+          </li>
+        
+          <li>
             <a href="../../../07/13/fast%20bin%20double%20freee%20attack/">fast bin double freee attack</a>
           </li>
         
@@ -156,14 +168,6 @@
         
           <li>
             <a href="../../21/CANARY%E7%88%86%E7%A0%B4/">CANARY爆破</a>
-          </li>
-        
-          <li>
-            <a href="../../15/bss/">bss段上的格式化字符串处理</a>
-          </li>
-        
-          <li>
-            <a href="../pwnable_orw%EF%BC%88%E9%87%8D%E7%82%B9%E4%B8%BA%E6%89%8B%E5%86%99shellcode%E4%B8%8E%E6%B2%99%E7%9B%92orw%E6%9C%BA%E5%88%B6%EF%BC%89/">pwnable_orw（重点为手写shellcode与沙盒orw机制）</a>
           </li>
         
       </ul>
@@ -188,7 +192,7 @@
   <div class="outer">
     <div id="footer-info" class="inner">
       
-      &copy; 2023 cy<br>
+      &copy; 2024 cy<br>
       Powered by <a href="https://hexo.io/" target="_blank">Hexo</a><br>
       
     </div>
